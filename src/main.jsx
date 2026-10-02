@@ -4,6 +4,7 @@ import { Search, MapPin, SlidersHorizontal, Heart, ArrowRight, ShieldCheck, Sofa
 import { animate, stagger } from 'animejs';
 import { supabase } from './lib/supabase';
 import './styles.css';
+import './auth.css';
 
 const rooms = [
   { id: 1, title: 'Bright private room near campus', location: 'Aliganj, Lucknow', price: 8500, tags: ['Wi-Fi', 'Furnished', 'Power backup'], image: 'https://images.unsplash.com/photo-1560185008-b033106af5c3?auto=format&fit=crop&w=900&q=80' },
