@@ -17,3 +17,6 @@ Initial responsive UI shell based on the RoomOra requirements and supplied refer
 npm install
 npm run dev
 ```
+
+## Automated build verification
+GitHub Actions runs `npm install` and `npm run build` on pushes to `main` and pull requests targeting `main`. This provides a clean remote environment for dependency installation and production-build verification when local network access is unavailable.
