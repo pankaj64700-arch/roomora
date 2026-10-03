@@ -12,9 +12,10 @@
 - [x] Migrate saved-items UI to shared marketplace infrastructure.
 - [x] Audit `MarketplacePanel` and split discovery controls/listing rails into focused components.
 - [x] Preserve marketplace search across title, description, locality/area, and city during the refactor.
+- [x] Extract reusable Button/Input/Badge/Search/Toast primitives.
+- [x] Add Android-friendly shared touch sizing to UI primitives.
 
 ## Next
-- [ ] Extract shared Button/Input/Badge/Search/Toast primitives.
 - [ ] Migrate My Published Items to shared marketplace card/form components.
 - [ ] Migrate Publish Item to shared form primitives.
 - [ ] Migrate dashboard styles onto design tokens.
