@@ -9,8 +9,10 @@ RoomOra should feel calm, trustworthy, modern, lightweight, practical, and human
 3. **Progressive disclosure** — show essential information first; reveal detail when useful.
 4. **Low visual noise** — avoid excessive borders, shadows, gradients, animation, and competing colors.
 5. **Content first** — marketplace imagery and listing information are the visual focus.
-6. **Responsive by default** — desktop and mobile are first-class layouts.
-7. **Accessible by default** — keyboard, screen-reader, contrast, reduced-motion, and touch considerations belong in component design.
+6. **Comfort first** — avoid interfaces that feel cramped or excessively spacious.
+7. **Android-friendly by default** — design for touch, mobile viewport behavior, browser chrome, and common Android interaction patterns.
+8. **Responsive by default** — desktop and mobile are first-class layouts.
+9. **Accessible by default** — keyboard, screen-reader, contrast, reduced-motion, and touch considerations belong in component design.
 
 ## 2. Source of truth
 Canonical visual tokens live in `src/styles/design-tokens.css`.
@@ -54,6 +56,8 @@ Headings should have clear hierarchy and restrained letter spacing. Body text sh
 ## 5. Spacing and layout
 Use the shared spacing tokens rather than arbitrary margins/padding.
 
+RoomOra uses a **comfortable-density** layout: neither cramped/tight nor excessively spacious. Prefer consistent medium gaps and enough breathing room around touch controls without wasting vertical space.
+
 Preferred structure:
 ```text
 Page
@@ -65,12 +69,49 @@ Page
 
 Keep content widths readable, align repeated sections to shared container edges, maintain vertical rhythm, avoid unnecessary nested cards, and preserve safe page padding on narrow screens.
 
-## 6. Radius, borders, and elevation
+## 6. Horizontal-first discovery
+For marketplace/discovery content, prefer **horizontal scrolling over stacking long rows vertically** when content is naturally a collection of cards.
+
+Use horizontal rails for:
+- marketplace category listings
+- recommended items
+- recently added items
+- saved/recent collections
+- compact feature collections
+
+Rules:
+- Each rail should clearly suggest that more content is available horizontally.
+- Use touch-friendly `overflow-x: auto` scrolling.
+- Hide/minimize scrollbars without removing discoverability.
+- Keep cards large enough to understand at a glance.
+- Scroll snapping may be used when it improves control.
+- Do not use horizontal scrolling for content requiring side-by-side comparison or long-form reading.
+- Avoid nested horizontal scroll containers where possible.
+
+Vertical scrolling remains appropriate for full pages, forms, detailed listing information, and long reading content. The goal is to reduce unnecessary vertical browsing, not eliminate vertical scrolling entirely.
+
+## 7. Android/mobile UX baseline
+RoomOra must feel natural on common Android phones and mobile browsers.
+
+- Design for touch first on mobile.
+- Use approximately 44–48 CSS px for primary touch targets where practical.
+- Keep interactive elements separated enough to prevent accidental taps.
+- Avoid hover-only interactions.
+- Never depend on precise pointer movement.
+- Respect safe-area insets where relevant.
+- Avoid fixed elements covering browser/system UI or content.
+- Do not assume a particular mobile viewport height; browser address bars can change available height.
+- Avoid `100vh`-only layouts for important content; use modern viewport units where appropriate.
+- Keep important actions reachable without awkward edge gestures.
+- Support Android software-keyboard behavior without hiding focused inputs or submit actions.
+- Avoid tiny icon-only controls when a clear text label would be easier to tap and understand.
+
+## 8. Radius, borders, and elevation
 Use shared radius tokens consistently: small for controls, medium for inputs/compact cards, large for major cards/panels, and XL for prominent feature surfaces.
 
 Use borders for structure and shadows for hierarchy. Do not stack heavy borders and heavy shadows without a clear reason.
 
-## 7. Buttons
+## 9. Buttons
 Use shared button primitives.
 
 - **Primary** — one main action per local context.
@@ -80,19 +121,23 @@ Use shared button primitives.
 
 Buttons need clear labels unless an icon has an accessible name. Disabled states must remain readable. Destructive actions must not look identical to primary actions. Avoid multiple competing primary buttons in one compact context.
 
-## 8. Forms and inputs
+On mobile, controls should remain easy to tap and should not be packed tightly into a toolbar.
+
+## 10. Forms and inputs
 Reusable form controls provide visible labels, useful placeholders, clear focus, validation/error state, disabled/loading state where needed, appropriate input types, and keyboard-friendly interaction.
 
 Errors should explain what went wrong and, where possible, how to fix it.
 
-## 9. Cards
+On Android, focused fields must remain visible when the software keyboard opens. Avoid layouts that place the submit action behind the keyboard.
+
+## 11. Cards
 Cards should group related information, not merely decorate.
 
 Marketplace cards consistently support image, category/status, title, short description, price, location, relevant date/expiry, and contextual actions.
 
 Do not create separate visual implementations of the same marketplace card for landing, marketplace, saved items, and my listings unless their interaction requirements genuinely differ.
 
-## 10. Marketplace imagery
+## 12. Marketplace imagery
 Use the shared `MarketplaceImage` component and image resolver.
 
 Image priority:
@@ -102,7 +147,7 @@ Image priority:
 
 Use `object-fit: cover` for listing thumbnails, lazy-load below-the-fold images, provide a meaningful fallback, and reserve known image dimensions to reduce layout shift.
 
-## 11. Filters, search, and sorting
+## 13. Filters, search, and sorting
 Use shared filter components and centralized category definitions.
 
 - Show only meaningful categories/results in discovery layouts.
@@ -110,13 +155,16 @@ Use shared filter components and centralized category definitions.
 - Make the active filter obvious.
 - Provide a clear empty state for a selected category with no results.
 - Search and filters must compose predictably.
+- On narrow screens, category filters may use a horizontal scroll rail instead of wrapping into a tall multi-line control area.
 
-## 12. Modals and dialogs
+## 14. Modals and dialogs
 Use the shared `Modal` component.
 
 Dialogs must have an accessible name, support Escape where appropriate, prevent accidental background interaction, manage page scroll, provide an obvious close action, and remain usable on small screens. Use modals for focused tasks rather than whole pages that deserve navigation.
 
-## 13. Loading, empty, error, and success states
+On Android, dialogs must fit within the available viewport when the keyboard is open and should not create difficult nested scrolling.
+
+## 15. Loading, empty, error, and success states
 Every data-driven screen must explicitly design these states.
 
 **Loading:** prefer skeletons when layout is predictable; avoid unnecessary full-page spinners.
@@ -127,7 +175,7 @@ Every data-driven screen must explicitly design these states.
 
 **Success:** confirm meaningful mutations such as publish, save, update, or delete without unnecessary interruption.
 
-## 14. Motion and transitions
+## 16. Motion and transitions
 Canonical motion tokens live in `design-tokens.css`.
 
 Motion should communicate cause/effect, reinforce hierarchy, clarify state changes, and remain short/subtle for routine interactions.
@@ -136,12 +184,14 @@ Preferred uses include hover elevation, filter transitions, modal entrance/exit,
 
 Avoid continuous decorative animation, large unexpected movement, animation that delays core tasks, or competing motion effects. Always honor `prefers-reduced-motion`.
 
-## 15. Interaction states
+Mobile motion should be especially restrained because touch interactions should feel immediate.
+
+## 17. Interaction states
 Every reusable interactive component should consider: default, hover, focus-visible, active/pressed, disabled, loading, success, error, and empty where applicable.
 
-Keyboard focus must remain visible and must not rely only on color.
+Keyboard focus must remain visible and must not rely only on color. Touch interactions should provide an equally clear pressed/active state even where hover is unavailable.
 
-## 16. Accessibility baseline
+## 18. Accessibility baseline
 - Use semantic HTML whenever practical.
 - Every form control needs an accessible label.
 - Icon-only controls need an accessible name.
@@ -154,11 +204,11 @@ Keyboard focus must remain visible and must not rely only on color.
 - Informative images need useful alternative text; decorative images should not create unnecessary screen-reader noise.
 - Dialogs and menus must expose appropriate semantics.
 
-## 17. Responsive behavior
+## 19. Responsive behavior
 Design from content constraints, not device-specific hacks.
 
-### Mobile
-Prioritize one-column layouts, use horizontal scrolling for compact collections where appropriate, keep actions reachable without precision tapping, avoid dense toolbars, and allow long content to wrap.
+### Mobile / Android
+Prioritize one-column page structure while using horizontal rails for card collections. Keep actions reachable, avoid dense toolbars, allow long content to wrap, keep controls comfortably tappable, and prevent fixed UI from obscuring content.
 
 ### Tablet
 Progressively increase grid columns and content width while preserving comfortable spacing.
@@ -166,24 +216,26 @@ Progressively increase grid columns and content width while preserving comfortab
 ### Desktop
 Use available width without excessively long reading lines, support multi-column discovery layouts, and keep primary actions visually anchored.
 
-## 18. Notifications and feedback
+## 20. Notifications and feedback
 Use one consistent notification/toast pattern for transient feedback. Notifications should be short, specific, non-blocking unless action is required, and distinguishable by semantic state.
 
 Do not duplicate the same success message in both a toast and persistent banner without a clear reason.
 
-## 19. Content and microcopy
+## 21. Content and microcopy
 Use plain, direct language. Prefer action labels such as `Save`, `Edit`, `Delete`, `Publish`, and `Send inquiry`. Avoid ambiguous labels such as `Proceed` when the actual action can be named. Empty states should be helpful rather than apologetic. User-facing errors should describe the failed operation rather than expose raw database errors.
 
-## 20. Component reuse rule
+## 22. Component reuse rule
 Before creating a new UI component, check whether an existing primitive can be extended safely.
 
 Before creating page-specific marketplace UI, check `MarketplaceCard`, `MarketplaceImage`, `MarketplaceFilters`, marketplace utilities, marketplace hooks, and shared UI primitives.
 
 If the same behavior appears in two or more surfaces, prefer extracting a reusable component or hook.
 
-## 21. Production quality gate
+## 23. Production quality gate
 A design change is not complete until it considers:
+- Android/mobile touch behavior
 - responsive behavior
+- horizontal discovery where appropriate
 - loading/empty/error/success states
 - keyboard/focus behavior
 - reduced motion
