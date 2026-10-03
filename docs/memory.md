@@ -35,6 +35,8 @@ This file records durable project decisions, completed work, important implement
 - Landing marketplace and Saved Items were migrated toward the shared marketplace components/hooks.
 - Shared UI primitives were started with `Modal` and `EmptyState`.
 - `MarketplaceToolbar` and `MarketplaceRows` were added as focused marketplace presentation components.
+- Reusable `Button`, `Input`, `Badge`, `SearchInput`, and `Toast` primitives were added under `src/components/ui/`.
+- Shared UI styling was expanded for those primitives, including Android-friendly minimum touch sizing and reduced-motion behavior.
 
 ### Design system
 - `src/styles/design-tokens.css` was introduced as the canonical visual-token layer.
@@ -70,12 +72,11 @@ This file records durable project decisions, completed work, important implement
 
 ## Current refactor direction
 The next production-cleanup work should migrate existing screens gradually onto the shared system:
-1. Extract shared Button/Input/Badge/Search/Toast primitives.
-2. Migrate My Published Items and publishing/edit forms onto shared marketplace/form components.
-3. Migrate dashboard styles onto design tokens.
-4. Remove duplicated marketplace CSS and business logic after replacement is verified.
-5. Verify responsive behavior, Android touch behavior, horizontal discovery rails, location search, and loading/empty/error/success states.
-6. Run build/lint/tests and production verification before declaring a refactor complete.
+1. Migrate My Published Items and publishing/edit forms onto shared marketplace/form components.
+2. Migrate dashboard styles onto design tokens.
+3. Remove duplicated marketplace CSS and business logic after replacement is verified.
+4. Verify responsive behavior, Android touch behavior, horizontal discovery rails, location search, and loading/empty/error/success states.
+5. Run build/lint/tests and production verification before declaring a refactor complete.
 
 ## Working rules
 - Keep changes focused.
