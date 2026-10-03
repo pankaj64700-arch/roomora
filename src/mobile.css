@@ -1,0 +1,74 @@
+/* Mobile-first dashboard and form fixes */
+@media (max-width: 800px) {
+  .dash-content { padding: 18px 14px 32px; }
+  .dash-top { min-height: 72px; padding: 12px 14px; }
+  .dash-top h1 { font-size: 18px; }
+  .dash-top-actions { gap: 6px; }
+  .dash-top-user { display: none; }
+  .dash-hero { display: block; }
+  .dash-hero h2 { font-size: 21px; }
+  .dash-action-row { margin-top: 14px; display: grid; grid-template-columns: 1fr; }
+  .dash-action-row > * { width: 100%; }
+  .dash-primary { justify-content: center; min-height: 44px; }
+
+  /* Keep the entire form reachable above/below the Android browser controls and keyboard. */
+  .modal-backdrop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom));
+  }
+  .auth-modal {
+    width: 100%;
+    max-width: 560px;
+    max-height: none;
+    height: auto;
+    min-height: 0;
+    margin: 0 auto;
+    padding: 20px 16px calc(22px + env(safe-area-inset-bottom));
+    border-radius: 18px;
+    overflow: visible;
+    flex: 0 0 auto;
+  }
+  .auth-modal form {
+    min-width: 0;
+    padding-bottom: 4px;
+  }
+  .auth-modal input,
+  .auth-modal select,
+  .auth-modal textarea,
+  .auth-modal button {
+    font-size: 16px;
+  }
+  .auth-modal textarea { min-height: 110px; }
+  .auth-modal .form-label { margin-bottom: 13px; }
+  .auth-modal .modal-close {
+    position: sticky;
+    float: right;
+    top: 0;
+    margin: -4px -2px 2px 8px;
+    z-index: 5;
+  }
+  .auth-modal h2 { clear: both; padding-top: 4px; font-size: 23px; }
+  .role-grid { grid-template-columns: 1fr; gap: 0; }
+  .upload-previews { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+  .upload-preview { min-width: 0; }
+
+  /* Give touch users a reliable scroll area if a form becomes taller than the viewport. */
+  .auth-modal:focus-within { scroll-margin-top: 12px; }
+}
+
+@media (max-width: 430px) {
+  .auth-modal { padding-left: 13px; padding-right: 13px; }
+  .upload-previews { grid-template-columns: 1fr 1fr 1fr; }
+  .upload-preview { aspect-ratio: 1 / 1; }
+}
+
+@supports (height: 100dvh) {
+  @media (max-width: 800px) {
+    .modal-backdrop { min-height: 100dvh; }
+  }
+}
