@@ -14,9 +14,9 @@
 - [x] Preserve marketplace search across title, description, locality/area, and city during the refactor.
 - [x] Extract reusable Button/Input/Badge/Search/Toast primitives.
 - [x] Add Android-friendly shared touch sizing to UI primitives.
+- [x] Migrate My Published Items to shared marketplace card/form/modal components.
 
 ## Next
-- [ ] Migrate My Published Items to shared marketplace card/form components.
 - [ ] Migrate Publish Item to shared form primitives.
 - [ ] Migrate dashboard styles onto design tokens.
 - [ ] Remove duplicated/obsolete marketplace CSS and logic.
