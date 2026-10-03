@@ -20,11 +20,11 @@ export default function MarketplaceLanding({ onOpenAuth }) {
       if (!supabase) return;
       const { data } = await supabase
         .from('marketplace_items')
-        .select('*')
+        .select('id,category,image_url,status,published_at,expires_at')
         .eq('status', 'published')
         .gt('expires_at', new Date().toISOString())
         .order('published_at', { ascending: false })
-        .limit(40);
+        .limit(80);
       if (mounted) setItems(data || []);
     };
     load();
@@ -36,16 +36,17 @@ export default function MarketplaceLanding({ onOpenAuth }) {
     animate('.market-landing-row', { opacity: [0, 1], translateY: [14, 0], delay: stagger(70), duration: 500, ease: 'out(3)' });
   }, [items.length]);
 
-  const imageFor = (item, fallback) => item.image_url || item.image || fallback;
-  const rowItems = (category) => items.filter((item) => category === 'second_hand' ? ['second_hand', 'other'].includes(item.category) : item.category === category);
+  const rowItems = category => items.filter(item => category === 'second_hand'
+    ? ['second_hand', 'other'].includes(item.category)
+    : item.category === category);
 
   return (
     <section className="market-landing" id="marketplace">
       <div className="market-landing-head">
         <div>
           <div className="eyebrow"><ShoppingBag size={14} /> ROOMORA MARKETPLACE</div>
-          <h2>Useful things, one simple scroll.</h2>
-          <p>Browse the categories visually. Sign in to see the listing details.</p>
+          <h2>Browse by category.</h2>
+          <p>Images first. Listing details become available after sign in.</p>
         </div>
         <button className="outline-btn" onClick={onOpenAuth}>Sign in to view details <ArrowRight size={16} /></button>
       </div>
@@ -53,6 +54,10 @@ export default function MarketplaceLanding({ onOpenAuth }) {
       <div className="market-landing-rows">
         {rows.map(([category, label, fallback]) => {
           const list = rowItems(category);
+          const cards = list.length ? list : [
+            { id: `${category}-placeholder-1`, image_url: fallback },
+            { id: `${category}-placeholder-2`, image_url: fallback }
+          ];
           return (
             <div className="market-landing-row" key={category}>
               <div className="market-row-title">
@@ -60,9 +65,9 @@ export default function MarketplaceLanding({ onOpenAuth }) {
                 <button onClick={onOpenAuth}>View details <ArrowRight size={14} /></button>
               </div>
               <div className="market-horizontal" aria-label={`${label} marketplace items`}>
-                {(list.length ? list : [{ id: `${category}-1`, image_url: fallback }, { id: `${category}-2`, image_url: fallback }]).map((item, index) => (
+                {cards.map((item, index) => (
                   <button className="market-image-card" key={item.id || index} onClick={onOpenAuth} aria-label={`Sign in to view ${label} details`}>
-                    <img src={imageFor(item, fallback)} alt="" loading="lazy" />
+                    <img src={item.image_url || fallback} alt="" loading="lazy" onError={e => { e.currentTarget.src = fallback; }} />
                   </button>
                 ))}
               </div>
