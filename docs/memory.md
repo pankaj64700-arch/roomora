@@ -9,6 +9,7 @@ This file records durable project decisions, completed work, important implement
 - My Published Items is the dedicated ownership/CRUD area.
 - Saved Items contains saved listings across marketplace categories, not only rooms.
 - New published listing images should flow from Supabase Storage into marketplace records and then appear on public landing discovery when the listing is active/published/non-expired.
+- Marketplace search must work across listing content and location: users can search within a city and within areas/localities of that city.
 
 ## Completed project work
 ### Marketplace
@@ -17,6 +18,8 @@ This file records durable project decisions, completed work, important implement
 - A dedicated My Published Items area was established for ownership-based edit/delete/CRUD operations.
 - Marketplace publishing, saving, and ownership boundaries were separated so marketplace discovery does not become an ownership-management surface.
 - The publishing transaction-type constraint issue was identified and addressed at the database/schema level so the marketplace publishing charge can use an allowed transaction type.
+- `MarketplacePanel` was audited and refactored into focused `MarketplaceToolbar` and `MarketplaceRows` components while preserving existing marketplace behavior.
+- The refactor explicitly preserves search across `title`, `description`, `locality`, and `city`.
 
 ### Landing page
 - Published marketplace listings are intended to appear on landing-page discovery when their records and image access are valid.
@@ -31,6 +34,7 @@ This file records durable project decisions, completed work, important implement
 - `useSavedItems` was introduced for saved-item retrieval and toggle behavior.
 - Landing marketplace and Saved Items were migrated toward the shared marketplace components/hooks.
 - Shared UI primitives were started with `Modal` and `EmptyState`.
+- `MarketplaceToolbar` and `MarketplaceRows` were added as focused marketplace presentation components.
 
 ### Design system
 - `src/styles/design-tokens.css` was introduced as the canonical visual-token layer.
@@ -49,6 +53,7 @@ This file records durable project decisions, completed work, important implement
 - Shared UI primitives belong under `components/ui`.
 - Page-specific CSS should consume shared tokens where possible rather than introducing arbitrary colors, spacing, shadows, radii, or motion values.
 - Refactors should be incremental so existing working flows are not broken by a large rewrite.
+- Marketplace location search is a first-class product requirement: preserve both `locality`/area and `city` in search/filter logic.
 
 ## Security decisions
 - User-owned marketplace mutations must be protected by Supabase RLS.
@@ -65,13 +70,12 @@ This file records durable project decisions, completed work, important implement
 
 ## Current refactor direction
 The next production-cleanup work should migrate existing screens gradually onto the shared system:
-1. Migrate global typography and remaining hard-coded visual values to design tokens.
-2. Consolidate buttons, inputs, cards, badges, loading states, toasts, and dialogs.
-3. Break large marketplace page components into focused components and hooks.
-4. Migrate My Published Items and publishing/edit forms onto the shared marketplace components.
-5. Remove duplicated marketplace CSS and business logic after replacement is verified.
-6. Verify responsive behavior, Android touch behavior, horizontal discovery rails, loading/empty/error/success states, and accessibility.
-7. Run build/lint and production verification before declaring a refactor complete.
+1. Extract shared Button/Input/Badge/Search/Toast primitives.
+2. Migrate My Published Items and publishing/edit forms onto shared marketplace/form components.
+3. Migrate dashboard styles onto design tokens.
+4. Remove duplicated marketplace CSS and business logic after replacement is verified.
+5. Verify responsive behavior, Android touch behavior, horizontal discovery rails, location search, and loading/empty/error/success states.
+6. Run build/lint/tests and production verification before declaring a refactor complete.
 
 ## Working rules
 - Keep changes focused.
