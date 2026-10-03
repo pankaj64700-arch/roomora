@@ -10,15 +10,16 @@
 - [x] Add shared marketplace and saved-items hooks.
 - [x] Migrate landing marketplace to shared marketplace infrastructure.
 - [x] Migrate saved-items UI to shared marketplace infrastructure.
+- [x] Audit `MarketplacePanel` and split discovery controls/listing rails into focused components.
+- [x] Preserve marketplace search across title, description, locality/area, and city during the refactor.
 
 ## Next
-- [ ] Audit `MarketplacePanel` and split it into focused components.
 - [ ] Extract shared Button/Input/Badge/Search/Toast primitives.
 - [ ] Migrate My Published Items to shared marketplace card/form components.
 - [ ] Migrate Publish Item to shared form primitives.
 - [ ] Migrate dashboard styles onto design tokens.
 - [ ] Remove duplicated/obsolete marketplace CSS and logic.
-- [ ] Verify responsive states.
+- [ ] Verify responsive states, especially Android touch and horizontal discovery rails.
 - [ ] Run build/lint/tests.
 - [ ] Verify production deployment separately from source changes.
 
@@ -29,6 +30,9 @@
 - [ ] Add error boundary strategy.
 - [ ] Add route/page loading states.
 - [ ] Add automated UI smoke checks for core flows.
+
+## Product-specific requirement
+Marketplace search must support finding items within a city and its local areas/localities. Search behavior must continue to include both `locality` and `city` fields when filtering listings.
 
 ## Rule
 Tasks should be completed in focused batches. Do not start multiple unrelated workstreams without recording them here.
