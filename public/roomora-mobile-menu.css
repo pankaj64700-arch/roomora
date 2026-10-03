@@ -1,0 +1,8 @@
+@media (max-width:800px){
+  .dash-menu{display:inline-flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:1100!important;flex:0 0 44px!important;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;align-items:center!important;justify-content:center!important;border:1px solid #c7d5cb!important;border-radius:11px!important;background:#fffef9!important;color:#2f6f55!important;box-shadow:0 6px 18px rgba(34,54,43,.12)!important;padding:0!important;margin:0!important}
+  .dash-menu svg{display:block!important;width:21px!important;height:21px!important;color:#2f6f55!important;stroke:#2f6f55!important}
+  .dash-top{position:sticky!important;top:0!important;z-index:1000!important}
+  .dash-top-left{position:relative!important;z-index:1001!important;display:flex!important;align-items:center!important}
+  .dash-sidebar{z-index:1200!important}
+  .dash-overlay{z-index:1150!important}
+}
