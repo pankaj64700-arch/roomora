@@ -7,6 +7,7 @@ import MarketplacePanel from './MarketplacePanel';
 import SubscriptionManager from './SubscriptionManager';
 import AdminAnalytics from './AdminAnalytics';
 import './dashboard.css';
+import './mobile.css';
 const navByRole={admin:[['overview','Overview',LayoutDashboard],['users','Users',Users],['rooms','Rooms',Home],['marketplace','Marketplace',ShoppingBag],['subscriptions','Subscriptions',Wallet],['analytics','Analytics',BarChart3],['history','Subscription history',Activity],['tokens','Tokens',Coins]],owner:[['overview','Overview',LayoutDashboard],['rooms','My rooms',Home],['activity','My activity',Activity],['inquiries','Inquiries',Bell]],shop:[['overview','Overview',LayoutDashboard],['products','Products',Package],['rooms','Rooms',Home],['activity','My activity',Activity],['orders','Orders',Box]],tenant:[['overview','Overview',LayoutDashboard],['marketplace','Marketplace',ShoppingBag],['activity','My activity',Activity],['saved','Saved rooms',Home],['contacts','Contacts',Bell]]};
 function Stat({icon:Icon,label,value,hint}){return <article className="dash-stat"><div className="dash-stat-icon"><Icon size={18}/></div><div><span>{label}</span><strong>{value}</strong><small>{hint}</small></div></article>}
 function EmptyState({icon:Icon,title,text,action}){return <div className="dash-empty"><div className="dash-empty-icon"><Icon size={20}/></div><b>{title}</b><span>{text}</span>{action&&<button className="dash-primary"><Plus size={16}/>{action}</button>}</div>}
