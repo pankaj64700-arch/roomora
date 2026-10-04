@@ -1,0 +1,14 @@
+/* Compact commerce layout for Android-sized screens. */
+@media(max-width:680px){
+  .market-horizontal{display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:7px;scroll-snap-type:x mandatory;padding-bottom:5px}
+  .market-detail-card{flex:0 0 calc((100vw - 31px)/2)!important;min-width:calc((100vw - 31px)/2)!important;border-radius:10px;scroll-snap-align:start}
+  .market-detail-image{height:92px!important}
+  .market-detail-body{padding:7px!important}
+  .market-detail-category{font-size:7px!important}
+  .market-detail-body h4{font-size:11px!important;margin:3px 0!important}
+  .market-detail-body p{font-size:8px!important;line-height:1.35!important;height:22px!important;margin-bottom:4px!important}
+  .market-detail-body strong{font-size:11px!important}
+  .market-detail-body small,.market-detail-body footer{font-size:7px!important}
+  .market-card-actions{gap:3px!important}
+  .market-card-actions button{min-height:25px!important;padding:3px 6px!important;font-size:7px!important}
+}
