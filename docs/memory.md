@@ -10,6 +10,7 @@ This file records durable project decisions, completed work, important implement
 - Saved Items contains saved listings across marketplace categories, not only rooms.
 - New published listing images should flow from Supabase Storage into marketplace records and then appear on public landing discovery when the listing is active/published/non-expired.
 - Marketplace search must work across listing content and location: users can search within a city and within areas/localities of that city.
+- Dashboard modules must be functional for every role; placeholders are not acceptable in the production dashboard.
 
 ## Completed project work
 ### Marketplace
@@ -27,6 +28,17 @@ This file records durable project decisions, completed work, important implement
 ### Landing page
 - Published marketplace listings are intended to appear on landing-page discovery when their records and image access are valid.
 - Empty category sections were identified as a poor UX and the landing experience was changed toward rendering only categories with meaningful results.
+
+### Dashboard
+- Dashboard browser/system Back navigation was changed to use real URL history entries and `popstate`, so Android/browser Back can move between dashboard views without a full reload.
+- Saved Items now uses the same `MarketplaceCard` presentation as Marketplace rather than a separate saved-item card.
+- Reusable `DashboardWorkspacePanel` was added for data-driven role modules.
+- Admin Users now reads real profile data.
+- Shop Products now reads the user's marketplace products.
+- Owner/shop Inquiries/Orders now read real marketplace inquiry data and support accept/decline actions.
+- Tenant Contacts now reads the user's unlocked room contacts.
+- Dashboard workspace modules include search, refresh, loading, empty, error, and action states and are responsive for mobile/Android.
+- Dashboard task tracking now explicitly identifies owner room CRUD and role-specific overview improvements as remaining work rather than pretending those areas are complete.
 
 ### Reusable architecture
 - Shared marketplace definitions/utilities were introduced under `src/components/marketplace/marketplace.js`.
@@ -66,6 +78,7 @@ This file records durable project decisions, completed work, important implement
 - Marketplace location search is a first-class product requirement: preserve both `locality`/area and `city` in search/filter logic.
 - Filters that represent the same marketplace concept must be shared between Landing/Marketplace and My Published Items rather than reimplemented per page.
 - The visual card component should be shared across marketplace discovery and owner listing surfaces; ownership changes available actions, not the basic card design.
+- Dashboard role modules should use reusable workspace components when the data interaction is structurally similar, while keeping role-specific queries and permissions separate.
 
 ## Security decisions
 - User-owned marketplace mutations must be protected by Supabase RLS.
@@ -82,11 +95,13 @@ This file records durable project decisions, completed work, important implement
 
 ## Current refactor direction
 The next production-cleanup work should migrate existing screens gradually onto the shared system:
-1. Migrate Publish Item to shared form primitives.
-2. Migrate dashboard styles onto design tokens.
-3. Remove duplicated marketplace CSS and business logic after replacement is verified.
-4. Verify responsive behavior, Android touch behavior, horizontal discovery rails, location search, and loading/empty/error/success states.
-5. Run build/lint/tests and production verification before declaring a refactor complete.
+1. Complete owner room management CRUD.
+2. Improve role-specific dashboard overview summaries.
+3. Migrate Publish Item to shared form primitives.
+4. Migrate dashboard styles onto design tokens.
+5. Remove duplicated marketplace/dashboard CSS and business logic after replacement is verified.
+6. Verify responsive behavior, Android touch behavior, horizontal discovery rails, location search, and loading/empty/error/success states.
+7. Run build/lint/tests and production verification before declaring a refactor complete.
 
 ## Working rules
 - Keep changes focused.
