@@ -1,6 +1,15 @@
 import React from 'react';
-import {Bookmark,MapPin,ShoppingBag,Trash2} from 'lucide-react';
-import MarketplaceImage from './components/marketplace/MarketplaceImage';
-import {categoryLabel,formatMarketplacePrice} from './components/marketplace/marketplace';
+import {Bookmark,ShoppingBag} from 'lucide-react';
+import MarketplaceCard from './components/marketplace/MarketplaceCard';
+import EmptyState from './components/ui/EmptyState';
 import useSavedItems from './hooks/useSavedItems';
-export default function SavedItemsPanel({user}){const{saved,loading,error,toggle}=useSavedItems(user?.id);if(loading)return <section className="dash-panel"><div className="dash-empty">Loading saved items…</div></section>;return <section className="dash-panel dash-reveal"><div className="dash-panel-head"><div><span>YOUR SAVED MARKETPLACE</span><h3>Saved items</h3></div><Bookmark size={18}/></div>{error&&<div className="auth-message">{error}</div>}{saved.length?<div className="my-listings-grid">{saved.map(item=><article className="my-listing-card" key={item.id}><MarketplaceImage item={item} /><div className="my-listing-body"><span className="listing-status published">{categoryLabel(item.category)}</span><h4>{item.title}</h4><p>{item.description}</p><strong>{formatMarketplacePrice(item.price)}</strong><small><MapPin size={12}/> {item.locality}, {item.city}</small><div className="my-listing-actions"><button className="outline-btn danger-btn" onClick={()=>toggle(item.id)}><Trash2 size={14}/> Remove saved</button></div></div></article>)}</div>:<div className="dash-empty"><div className="dash-empty-icon"><ShoppingBag size={20}/></div><b>No saved items yet</b><span>Save any marketplace item here.</span></div>}</section>}
+
+export default function SavedItemsPanel({user}){
+ const{saved,loading,error,toggle}=useSavedItems(user?.id);
+ if(loading)return <section className="dash-panel"><div className="dash-empty">Loading saved items…</div></section>;
+ return <section className="dash-panel dash-reveal">
+  <div className="dash-panel-head"><div><span>YOUR SAVED MARKETPLACE</span><h3>Saved items</h3></div><Bookmark size={18}/></div>
+  {error&&<div className="auth-message">{error}</div>}
+  {saved.length?<div className="saved-marketplace-grid">{saved.map(item=><MarketplaceCard key={item.id} item={item} saved onSave={()=>toggle(item.id)} onOpen={()=>{}} />)}</div>:<EmptyState icon={ShoppingBag} title="No saved items yet" description="Save any marketplace item here."/>}
+ </section>
+}
