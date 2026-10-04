@@ -20,6 +20,9 @@ This file records durable project decisions, completed work, important implement
 - The publishing transaction-type constraint issue was identified and addressed at the database/schema level so the marketplace publishing charge can use an allowed transaction type.
 - `MarketplacePanel` was audited and refactored into focused `MarketplaceToolbar` and `MarketplaceRows` components while preserving existing marketplace behavior.
 - The refactor explicitly preserves search across `title`, `description`, `locality`, and `city`.
+- Landing rows now reuse the shared `MarketplaceCard` rather than maintaining a second listing-card implementation.
+- Landing/Marketplace and My Published Items now reuse the same `MarketplaceToolbar` and `MarketplaceFilters` behavior.
+- My Published Items supports the same item/category/area/city search model as Marketplace.
 
 ### Landing page
 - Published marketplace listings are intended to appear on landing-page discovery when their records and image access are valid.
@@ -38,8 +41,8 @@ This file records durable project decisions, completed work, important implement
 - Reusable `Button`, `Input`, `Badge`, `SearchInput`, and `Toast` primitives were added under `src/components/ui/`.
 - Shared UI styling was expanded for those primitives, including Android-friendly minimum touch sizing and reduced-motion behavior.
 - My Published Items was migrated to the shared `MarketplaceCard`, `MarketplaceEditForm`, `Modal`, `EmptyState`, and `Button` components.
-- Owner cards now intentionally omit the Save action; saving remains a Marketplace operation.
-- My Published Items delete confirmation was moved from browser `confirm()` to the shared modal system for a more consistent mobile experience.
+- Owner cards intentionally omit the Save action; saving remains a Marketplace operation.
+- My Published Items delete confirmation uses the shared modal system instead of browser `confirm()`.
 
 ### Design system
 - `src/styles/design-tokens.css` was introduced as the canonical visual-token layer.
@@ -49,6 +52,8 @@ This file records durable project decisions, completed work, important implement
 - The UI must feel comfortable-density: neither cramped/tight nor excessively spacious.
 - Android/mobile UX is a first-class requirement.
 - For naturally card-based discovery collections, horizontal scrolling/rails are preferred over unnecessarily stacking long collections vertically.
+- Marketplace cards and owner listing grids were tuned smaller so more items and actions can fit on screen while preserving readable hierarchy and comfortable touch targets.
+- Category filters use compact horizontally scrollable controls on narrow screens.
 
 ## Architecture decisions
 - Use reusable components and hooks rather than duplicated page implementations.
@@ -59,6 +64,8 @@ This file records durable project decisions, completed work, important implement
 - Page-specific CSS should consume shared tokens where possible rather than introducing arbitrary colors, spacing, shadows, radii, or motion values.
 - Refactors should be incremental so existing working flows are not broken by a large rewrite.
 - Marketplace location search is a first-class product requirement: preserve both `locality`/area and `city` in search/filter logic.
+- Filters that represent the same marketplace concept must be shared between Landing/Marketplace and My Published Items rather than reimplemented per page.
+- The visual card component should be shared across marketplace discovery and owner listing surfaces; ownership changes available actions, not the basic card design.
 
 ## Security decisions
 - User-owned marketplace mutations must be protected by Supabase RLS.
