@@ -10,6 +10,6 @@ export default function SavedItemsPanel({user}){
  return <section className="dash-panel dash-reveal">
   <div className="dash-panel-head"><div><span>YOUR SAVED MARKETPLACE</span><h3>Saved items</h3></div><Bookmark size={18}/></div>
   {error&&<div className="auth-message">{error}</div>}
-  {saved.length?<div className="saved-marketplace-grid">{saved.map(item=><MarketplaceCard key={item.id} item={item} saved onSave={()=>toggle(item.id)} onOpen={()=>{}} />)}</div>:<EmptyState icon={ShoppingBag} title="No saved items yet" description="Save any marketplace item here."/>}
+  {saved.length?<div className="saved-marketplace-grid">{saved.map(item=><MarketplaceCard key={item.id} item={item} saved onSave={()=>toggle(item.id)} onOpen={()=>{}} />)}</div>:<EmptyState icon={<ShoppingBag size={20}/>} title="No saved items yet" message="Save any marketplace item here."/>}
  </section>
 }
