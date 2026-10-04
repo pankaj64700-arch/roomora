@@ -2,6 +2,7 @@ import React from 'react';
 import {Bookmark,MapPin,Clock} from 'lucide-react';
 import MarketplaceImage from './MarketplaceImage';
 import {categoryLabel,formatMarketplacePrice} from './marketplace';
+import {Button} from '../ui/Button';
 
 export default function MarketplaceCard({item,onOpen,onSave,saved=false,owner=false,onEdit,onDelete}){
  return <article className="market-detail-card ui-interactive">
@@ -12,8 +13,8 @@ export default function MarketplaceCard({item,onOpen,onSave,saved=false,owner=fa
    <small><MapPin size={12}/> {item.locality}, {item.city}</small>
    <footer><span><Clock size={12}/> {item.expires_at?`Until ${new Date(item.expires_at).toLocaleDateString()}`:'Active'}</span>
     <div className="market-card-actions">
-     {!owner&&<button className={saved?'market-save saved':'market-save'} onClick={()=>onSave?.(item)}><Bookmark size={15}/> {saved?'Saved':'Save'}</button>}
-     {owner&&<><button className="market-save" onClick={()=>onEdit?.(item)}>Edit</button><button className="market-save" onClick={()=>onDelete?.(item)}>Delete</button></>}
+     {!owner&&<Button type="button" size="sm" variant={saved?'primary':'secondary'} onClick={()=>onSave?.(item)}><Bookmark size={15}/> {saved?'Saved':'Save'}</Button>}
+     {owner&&<><Button type="button" size="sm" variant="secondary" onClick={()=>onEdit?.(item)}>Edit</Button><Button type="button" size="sm" variant="danger" onClick={()=>onDelete?.(item)}>Delete</Button></>}
     </div>
    </footer>
   </div>
