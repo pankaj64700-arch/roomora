@@ -7,6 +7,7 @@ import Dashboard from './Dashboard';
 import MarketplaceLanding from './MarketplaceLanding';
 import './styles.css';
 import './auth.css';
+import './mobile-commerce.css';
 
 const roleOptions = [
   { key: 'tenant', label: 'Tenant', note: 'Find rooms and sell used belongings when moving.' },
