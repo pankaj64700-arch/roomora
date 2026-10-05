@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createRoot } from 'react-dom/client';
 import { ArrowRight, Menu, ShieldCheck, UserRound, LogOut, X, Eye, EyeOff } from 'lucide-react';
 import { animate, stagger } from 'animejs';
 import { supabase } from './lib/supabase';
