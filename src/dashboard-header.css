@@ -1,3 +1,30 @@
 .dash-top{display:flex;align-items:center;gap:10px;min-height:64px}.dash-profile-btn{order:0;width:40px;height:40px;min-width:40px;padding:0;border:1px solid var(--ro-line);background:rgba(255,255,252,.9);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--ro-primary);cursor:pointer;flex:0 0 40px}.dash-profile-btn span{display:none}.dash-top-left{order:1;display:flex;align-items:center;min-width:0}.dash-top-left>div{min-width:0}.dash-menu,.dash-top-actions{display:none}.dash-market-tools{order:2;margin-left:auto;display:flex;align-items:center;flex:0 0 auto;min-width:0}.dash-market-tools .market-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:0;width:auto}.dash-market-tools .market-search{flex:0 0 auto;min-width:0}.dash-market-tools .market-search.is-open{min-width:220px}.dash-market-tools .market-location-hint{display:none}.dash-market-tools .market-filters{flex:0 0 auto;max-width:none}.dash-market-tools .market-filters select{max-width:150px}.profile-modal{width:min(560px,100%)}
 @media(max-width:900px){.dash-top{gap:8px}.dash-market-tools{margin-left:auto}.dash-market-tools .market-tools{gap:6px}.dash-market-tools .market-search.is-open{min-width:180px}}
 @media(max-width:680px){.dash-top{padding:10px 14px;min-height:60px}.dash-profile-btn{width:38px;height:38px;min-width:38px;flex-basis:38px}.dash-top h1{font-size:17px}.dash-market-tools .market-tools{gap:5px}.dash-market-tools .market-search.is-open{min-width:150px}.dash-market-tools .market-search.is-open input{font-size:12px}.dash-market-tools .market-filters select{max-width:110px;font-size:11px}}
+
+/* Compact marketplace controls inside the dashboard top bar */
+.dash-market-tools .market-tools{position:relative;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.dash-market-tools .market-search{position:relative;display:flex;align-items:center}
+.dash-market-tools .market-tool-icon,
+.dash-market-tools .market-search-close,
+.dash-market-tools .market-filter-trigger{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;border:1px solid var(--ro-line);border-radius:9px;background:#fff;color:var(--ro-primary);cursor:pointer;box-sizing:border-box}
+.dash-market-tools .market-tool-icon{width:38px;padding:0}
+.dash-market-tools .market-tool-icon:hover,
+.dash-market-tools .market-filter-trigger:hover{background:#f5f8f5;border-color:var(--ro-primary)}
+.dash-market-tools .market-search.is-open{width:250px}
+.dash-market-tools .market-search.is-open .search-input,
+.dash-market-tools .market-search.is-open input{width:100%;height:38px;border:1px solid var(--ro-line);border-radius:9px;background:#fff;padding:0 38px 0 12px;outline:none;box-sizing:border-box;color:var(--ink)}
+.dash-market-tools .market-search.is-open input:focus{border-color:var(--ro-primary);box-shadow:0 0 0 3px rgba(47,125,84,.1)}
+.dash-market-tools .market-search-close{position:absolute;right:3px;top:3px;width:32px;height:32px;border:0;background:transparent}
+.dash-market-tools .market-filters{position:relative;display:block;flex:0 0 auto}
+.dash-market-tools .market-filter-trigger{padding:0 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.dash-market-tools .market-filter-menu{position:absolute;right:0;top:calc(100% + 7px);z-index:1000;min-width:190px;padding:5px;background:#fff;border:1px solid var(--ro-line);border-radius:10px;box-shadow:0 12px 28px rgba(20,35,27,.14);display:flex;flex-direction:column;gap:2px}
+.dash-market-tools .market-filter-menu button{width:100%;border:0;background:transparent;border-radius:7px;padding:9px 10px;text-align:left;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap}
+.dash-market-tools .market-filter-menu button:hover,.dash-market-tools .market-filter-menu button.active{background:#eef5ef;color:var(--ro-primary);font-weight:700}
+@media(max-width:680px){
+ .dash-market-tools .market-search.is-open{width:170px}
+ .dash-market-tools .market-filter-trigger{height:34px;font-size:11px;padding:0 8px}
+ .dash-market-tools .market-tool-icon{width:34px;height:34px}
+ .dash-market-tools .market-search.is-open input{height:34px}
+ .dash-market-tools .market-search-close{width:28px;height:28px}
+}
