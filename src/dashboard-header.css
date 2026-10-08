@@ -28,3 +28,19 @@
  .dash-market-tools .market-search.is-open input{height:34px}
  .dash-market-tools .market-search-close{width:28px;height:28px}
 }
+
+/* Dashboard header owns the marketplace toolbar on mobile too. Do not let the page-level commerce rules turn it into a full-width/sticky content control. */
+.dash-market-tools{width:auto;align-self:center;overflow:visible}
+.dash-market-tools .market-tools{width:auto;max-width:none;flex:0 0 auto;margin:0;padding:0;position:relative;align-items:center}
+.dash-market-tools .market-search{width:auto;height:auto;margin:0;flex:0 0 auto;position:relative}
+.dash-market-tools .market-search:not(.is-open){width:34px}
+.dash-market-tools .market-filters{position:relative;top:auto;z-index:20;width:auto;max-width:none;margin:0;padding:0;background:transparent;flex:0 0 auto;display:block}
+.dash-market-tools .market-filters button{min-height:34px}
+@media(max-width:680px){
+ .dash-market-tools{margin-left:auto;min-width:0;max-width:calc(100vw - 120px)}
+ .dash-market-tools .market-tools{gap:5px;white-space:nowrap}
+ .dash-market-tools .market-search{width:auto;margin:0}
+ .dash-market-tools .market-search:not(.is-open){width:34px}
+ .dash-market-tools .market-filters{margin:0;padding:0;background:transparent;position:relative;top:auto}
+ .dash-market-tools .market-filter-trigger{min-height:34px;height:34px}
+}
