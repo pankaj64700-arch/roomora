@@ -8,3 +8,10 @@
 @media(min-width:1500px){.market-hero{min-height:clamp(280px,20vh,360px)}.market-image-card{flex-basis:250px}.market-image-card-media{height:150px}}
 @media(min-width:1900px){.market-landing-content{max-width:1600px}.market-image-card{flex-basis:270px}.market-image-card-media{height:162px}}
 @media(prefers-reduced-motion:reduce){.market-image-card{transition:none}.market-image-card:hover{transform:none}}
+
+/* Shared marketplace card interaction surface */
+.market-card-open{display:block;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.market-card-open:focus-visible{outline:2px solid var(--ro-primary);outline-offset:3px;border-radius:10px}
+.market-card-open:hover .market-image-card-media img{transform:scale(1.025)}
+.market-card-open .market-image-card-media img{transition:transform .22s ease}
+@media(prefers-reduced-motion:reduce){.market-card-open .market-image-card-media img{transition:none}}
