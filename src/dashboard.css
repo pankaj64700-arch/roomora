@@ -7,3 +7,9 @@
 @media(max-width:800px){.dash-sidebar{position:fixed;left:-270px;transition:left .22s;width:250px;box-shadow:8px 0 30px rgba(0,0,0,.08)}.dash-sidebar.open{left:0}.dash-close{display:grid;margin-left:auto;border:0;background:transparent;cursor:pointer}.dash-menu{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:#eef3ee}.dash-top{padding:12px 14px}.dash-content{padding:16px}.dash-top-user{display:none}.dash-stats{grid-template-columns:repeat(2,1fr)}.subscription-manager{grid-template-columns:1fr}.admin-grid{grid-template-columns:1fr}.role-grid{grid-template-columns:1fr}.upload-previews{grid-template-columns:repeat(2,1fr)}.saved-marketplace-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.saved-marketplace-grid .market-detail-body footer{align-items:flex-start;flex-direction:column}.saved-marketplace-grid .market-card-actions{justify-content:flex-start}}
 @media(max-width:420px){.saved-marketplace-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.saved-marketplace-grid .market-detail-body{padding:8px}.saved-marketplace-grid .ui-btn{min-height:40px;padding:7px 9px;font-size:.78rem}}
 @media(min-width:801px){.saved-marketplace-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}}
+
+/* Compact marketplace panel action row */
+.dash-panel-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;width:100%;margin:0 0 12px}
+.dash-panel-actions>.market-filters{margin:0;flex:0 0 auto}
+.dash-panel-actions>.publish-item-trigger,.dash-panel-actions button{flex:0 0 auto}
+@media(max-width:680px){.dash-panel-actions{justify-content:flex-end;gap:6px;margin-bottom:10px}.dash-panel-actions .market-filter-trigger{height:34px;min-height:34px}.dash-panel-actions .publish-item-trigger{height:34px}}
