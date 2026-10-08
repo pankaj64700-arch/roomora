@@ -7,7 +7,7 @@ import MarketplaceCard from './components/marketplace/MarketplaceCard';
 import EmptyState from './components/ui/EmptyState';
 import useSavedItems from './hooks/useSavedItems';
 
-export default function SavedItemsPanel({user}){
+export default function SavedItemsPanel({user,tokenBalance=0}){
  const{saved,loading,error,toggle}=useSavedItems(user?.id);
  const [category,setCategory]=React.useState('all');
  const counts=React.useMemo(()=>Object.fromEntries(MARKETPLACE_CATEGORIES.map(([cat])=>[cat,saved.filter(x=>normalizedCategory(x.category)===cat).length])),[saved]);
@@ -15,7 +15,7 @@ export default function SavedItemsPanel({user}){
  if(loading)return <section className="dash-panel"><div className="dash-empty">Loading saved items…</div></section>;
  return <section className="dash-panel dash-reveal">
   <div className="dash-panel-actions">
-   <PublishItemPanel user={user} tokenBalance={0}/>
+   <PublishItemPanel user={user} tokenBalance={tokenBalance}/>
    <MarketplaceFilters value={category} onChange={setCategory} counts={counts}/>
   </div>
   {error&&<div className="auth-message">{error}</div>}
