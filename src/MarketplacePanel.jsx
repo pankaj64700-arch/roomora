@@ -2,6 +2,7 @@ import React,{useEffect,useMemo,useState} from 'react';
 import {ShoppingBag,Bookmark,X,MapPin,Phone,UserRound,Pencil,Trash2,Send} from 'lucide-react';
 import {supabase} from './lib/supabase';
 import MarketplaceFilters from './components/marketplace/MarketplaceFilters';
+import PublishItemPanel from './PublishItemPanel';
 import MarketplaceRows from './components/marketplace/MarketplaceRows';
 import MarketplaceGallery from './components/marketplace/MarketplaceGallery';
 import './marketplace.css';
