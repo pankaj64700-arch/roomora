@@ -11,7 +11,7 @@ const rows=[['room','Rooms'],['furniture','Furniture'],['stationery','Stationery
 const fallback={room:'https://images.unsplash.com/photo-1560185008-b033106af5c3?auto=format&fit=crop&w=900&q=85',furniture:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=85',stationery:'https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&w=900&q=85',second_hand:'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=900&q=85'};
 const catLabel=c=>rows.find(x=>x[0]===c)?.[1]||'Marketplace item';
 
-export default function MarketplacePanel({user,profile}){
+export default function MarketplacePanel({user,profile,tokenBalance=0}){
  const [items,setItems]=useState([]),[profiles,setProfiles]=useState({}),[category,setCategory]=useState('all'),[selected,setSelected]=useState(null),[saved,setSaved]=useState([]),[loading,setLoading]=useState(true),[chat,setChat]=useState(''),[message,setMessage]=useState(''),[notice,setNotice]=useState(''),[edit,setEdit]=useState(null),[savingEdit,setSavingEdit]=useState(false);
  const load=async()=>{if(!supabase||!user)return;setLoading(true);const [pub,own,fav]=await Promise.all([supabase.from('marketplace_items').select('*').eq('status','published').gt('expires_at',new Date().toISOString()).order('published_at',{ascending:false}),supabase.from('marketplace_items').select('*').eq('user_id',user.id).order('created_at',{ascending:false}),supabase.from('marketplace_favorites').select('item_id').eq('user_id',user.id)]);const map=new Map();[...(pub.data||[]),...(own.data||[])].forEach(x=>map.set(x.id,x));const list=[...map.values()];setItems(list);setSaved((fav.data||[]).map(x=>x.item_id));const ids=[...new Set(list.map(x=>x.user_id).filter(Boolean))];if(ids.length){const {data:p}=await supabase.from('profiles').select('id,display_name,phone,contact_email,contact_phone,contact_address').in('id',ids);setProfiles(Object.fromEntries((p||[]).map(x=>[x.id,x])))}setLoading(false)};
  useEffect(()=>{load()},[user?.id]);
@@ -25,7 +25,7 @@ export default function MarketplacePanel({user,profile}){
  const saveEdit=async()=>{if(!edit)return;setSavingEdit(true);const {data,error}=await supabase.from('marketplace_items').update({title:edit.title.trim(),description:edit.description.trim(),price:Number(edit.price)||0,city:edit.city.trim(),locality:edit.locality.trim(),category:edit.category}).eq('id',edit.id).eq('user_id',user.id).select().single();setSavingEdit(false);if(error){setNotice(error.message);return}setEdit(null);setSelected(data);setNotice('Listing updated.');await load()};
  return <section className="marketplace-panel dash-reveal">
   <div className="dash-panel-actions">
-   <PublishItemPanel user={user} tokenBalance={profile?.token_balance||0} onCreated={load}/>
+   <PublishItemPanel user={user} tokenBalance={tokenBalance} onCreated={load}/>
    <MarketplaceFilters value={category} onChange={setCategory} counts={categoryCounts}/>
   </div>
   {notice&&<div className="auth-message">{notice}</div>}
