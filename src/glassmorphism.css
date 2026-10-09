@@ -1,0 +1,110 @@
+/* RoomOra glass design system — shared across landing, auth, marketplace and dashboard. */
+:root{
+  --glass-bg:rgba(255,255,255,.66);
+  --glass-bg-strong:rgba(255,255,255,.82);
+  --glass-border:rgba(255,255,255,.76);
+  --glass-line:rgba(68,94,77,.16);
+  --glass-blur:18px;
+  --glass-shadow:0 12px 34px rgba(35,55,43,.09),inset 0 1px 0 rgba(255,255,255,.72);
+  --glass-shadow-hover:0 18px 42px rgba(35,55,43,.14),inset 0 1px 0 rgba(255,255,255,.88);
+  --glass-radius:16px;
+}
+html{background:#eef2ec}
+body{
+  background:
+    radial-gradient(ellipse at 12% 5%,rgba(155,194,170,.26),transparent 32%),
+    radial-gradient(ellipse at 92% 18%,rgba(218,205,166,.24),transparent 29%),
+    radial-gradient(ellipse at 72% 94%,rgba(175,204,188,.22),transparent 32%),
+    #f2f4ef;
+  background-attachment:fixed;
+}
+.topbar,.dash-top,.dash-sidebar,.dash-bottom-nav{
+  background:rgba(248,250,246,.68)!important;
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(145%);
+  backdrop-filter:blur(var(--glass-blur)) saturate(145%);
+  border-color:var(--glass-line)!important;
+}
+.topbar{box-shadow:0 5px 24px rgba(38,59,45,.045)}
+.dash-sidebar{background:rgba(246,249,244,.72)!important}
+.dash-profile,.dash-panel,.workspace-card,.auth-modal,.empty-state,.feature-card,.feature-band,
+.marketplace-seller,.marketplace-panel,.subscription-plan-card,.subscription-balance,
+.chat-list,.chat-thread-head,.chat-item-strip,.chat-composer,.dash-empty,.marketplace-owner-grid .market-image-card{
+  background:var(--glass-bg)!important;
+  border:1px solid var(--glass-border)!important;
+  box-shadow:var(--glass-shadow);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(140%);
+  backdrop-filter:blur(var(--glass-blur)) saturate(140%);
+}
+.dash-panel,.workspace-card,.auth-modal,.subscription-plan-card{border-radius:var(--glass-radius)!important}
+.dash-main,.dashboard-shell{background:transparent}
+.dashboard-shell{background:radial-gradient(circle at 85% 5%,rgba(125,177,145,.19),transparent 27%),radial-gradient(circle at 4% 86%,rgba(220,205,158,.2),transparent 28%),rgba(240,243,237,.72)!important}
+.dash-nav button.active{background:rgba(215,235,222,.72)!important;box-shadow:inset 3px 0 0 var(--ro-primary),0 8px 24px rgba(47,111,85,.08)}
+.dash-nav button:hover,.dash-back:hover{background:rgba(222,238,226,.68)!important}
+.market-landing{background:transparent!important}
+.market-hero{
+  position:relative;isolation:isolate;
+  background:linear-gradient(115deg,rgba(21,43,32,.94),rgba(42,82,61,.82))!important;
+  overflow:hidden;
+}
+.market-hero:after{
+  content:"";position:absolute;z-index:-1;width:clamp(180px,32vw,460px);aspect-ratio:1;
+  right:clamp(-90px,8vw,120px);top:50%;transform:translateY(-50%);
+  border:1px solid rgba(255,255,255,.2);border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.2),rgba(255,255,255,.025) 58%,transparent 70%);
+  box-shadow:inset 0 0 50px rgba(255,255,255,.08),0 0 90px rgba(168,209,181,.09);
+}
+.market-search-wrap,.market-search-input-wrap,.chat-list-search input{
+  background:rgba(255,255,255,.78)!important;border:1px solid rgba(255,255,255,.78)!important;
+  box-shadow:inset 0 1px 2px rgba(24,45,32,.04),0 8px 24px rgba(25,49,34,.07);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)
+}
+.market-image-card,.room-card,.market-card,.marketplace-card,.listing-card,.product-card{
+  background:var(--glass-bg-strong)!important;border:1px solid var(--glass-border)!important;
+  box-shadow:var(--glass-shadow)!important;border-radius:15px!important;overflow:hidden;
+  -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.market-image-card:hover,.room-card:hover,.market-card:hover,.marketplace-card:hover,.listing-card:hover,.product-card:hover{
+  transform:translateY(-3px);box-shadow:var(--glass-shadow-hover)!important;border-color:rgba(255,255,255,.96)!important
+}
+.market-image-card-media{background:rgba(220,231,221,.48)}
+.market-image-card-info{background:rgba(255,255,255,.32)}
+button,.nav-cta,.search-btn,.auth-submit,.market-filter-trigger,.market-tool-icon{
+  transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease;
+}
+.nav-cta,.search-btn,.auth-submit,.btn-primary,.button-primary{
+  background:linear-gradient(135deg,#2f7655,#4c9270)!important;border:1px solid rgba(255,255,255,.35)!important;
+  box-shadow:0 7px 18px rgba(47,111,85,.2),inset 0 1px 0 rgba(255,255,255,.22)
+}
+.nav-login,.outline-btn,.filter-btn,.role-option,.modal-close,.heart,.room-foot button,.market-tool-icon,.market-filter-trigger{
+  background:rgba(255,255,255,.58)!important;border:1px solid rgba(255,255,255,.86)!important;
+  box-shadow:0 4px 14px rgba(34,54,43,.055);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)
+}
+input,select,textarea,.form-label>input,.password-wrap,.chat-composer input{
+  border-color:rgba(87,116,95,.22)!important;background:rgba(255,255,255,.72)!important;
+}
+input:focus,select:focus,textarea:focus,.form-label>input:focus,.password-wrap:focus-within{
+  outline:none;border-color:rgba(47,111,85,.56)!important;box-shadow:0 0 0 3px rgba(91,151,113,.13)!important
+}
+.auth-modal{background:rgba(250,252,248,.84)!important}
+.modal-backdrop{background:rgba(20,36,27,.38)!important;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
+.chat-layout{border:1px solid rgba(255,255,255,.75);border-radius:16px;overflow:hidden;box-shadow:var(--glass-shadow)}
+.chat-list-item{background:rgba(255,255,255,.55)!important}
+.chat-list-item:hover,.chat-list-item.active{background:rgba(218,237,224,.78)!important}
+.chat-thread,.chat-messages{background:rgba(231,239,231,.66)!important}
+.chat-bubble.incoming{background:rgba(255,255,255,.9)!important;backdrop-filter:blur(12px)}
+.chat-bubble.outgoing{background:rgba(207,239,210,.88)!important;backdrop-filter:blur(12px)}
+.chat-composer{background:rgba(248,250,246,.8)!important}
+.market-filter-menu{background:rgba(250,252,248,.94)!important;border:1px solid var(--glass-border)!important;border-radius:14px!important;box-shadow:var(--glass-shadow-hover)!important;backdrop-filter:blur(18px)}
+.market-filter-menu button:hover,.market-filter-menu button.active{background:rgba(217,235,222,.8)!important}
+footer{background:rgba(238,242,235,.62)}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media(max-width:680px){
+  :root{--glass-blur:14px;--glass-radius:13px}
+  .market-image-card,.room-card,.market-card,.marketplace-card,.listing-card,.product-card{border-radius:12px!important}
+  .dash-top{padding:12px 14px!important}
+  .market-hero:after{right:-95px;opacity:.72}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .topbar,.dash-top,.dash-sidebar,.dash-panel,.market-image-card,.auth-modal{background:rgba(248,250,246,.96)!important}
+}
