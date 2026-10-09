@@ -9,6 +9,7 @@ import './styles.css';
 import './auth.css';
 import './mobile-commerce.css';
 import './usability-fixes.css';
+import './glassmorphism.css';
 
 const roleOptions = [
   { key: 'tenant', label: 'Tenant', note: 'Find rooms and sell used belongings when moving.' },
