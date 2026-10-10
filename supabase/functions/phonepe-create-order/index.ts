@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, getPhonePeAccessToken, getServiceClient } from "../_shared/phonepe.ts";
+import { addCalendarMonth, corsHeaders, getPhonePeAccessToken, getServiceClient } from "../_shared/phonepe.ts";
 
 Deno.serve(async (req) => {
   const headers = corsHeaders(req);
@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     const siteUrl = Deno.env.get("ROOMORA_SITE_URL");
     if (!siteUrl) throw new Error("ROOMORA_SITE_URL is not configured");
     const now = new Date();
-    const periodEnd = new Date(now); periodEnd.setMonth(periodEnd.getMonth() + 1);
+    const periodEnd = addCalendarMonth(now);
     const merchantSubscriptionId = `RMS_${crypto.randomUUID().replaceAll("-", "")}`;
     const { data: subscription, error: subError } = await service.from("user_subscriptions").insert({
       user_id: user.id, plan_id: plan.id, status: "pending", billing_provider: "phonepe",
