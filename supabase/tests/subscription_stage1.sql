@@ -1,8 +1,8 @@
 -- Run only after applying Stage 1 in a development database.
 do $$ begin
  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='subscription_plans' and column_name='monthly_listing_limit') then raise exception 'Missing monthly_listing_limit'; end if;
- if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='subscription_plans' and column_name='razorpay_plan_id') then raise exception 'Missing razorpay_plan_id'; end if;
- if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='user_subscriptions' and column_name='razorpay_subscription_id') then raise exception 'Missing razorpay_subscription_id'; end if;
+ if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='subscription_plans' and column_name='phonepe_plan_id') then raise exception 'Missing phonepe_plan_id'; end if;
+ if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='user_subscriptions' and column_name='phonepe_subscription_id') then raise exception 'Missing phonepe_subscription_id'; end if;
  if to_regclass('public.subscription_payments') is null then raise exception 'Missing subscription_payments'; end if;
  if to_regclass('public.subscription_webhook_events') is null then raise exception 'Missing subscription_webhook_events'; end if;
  if to_regclass('public.subscription_token_grants') is null then raise exception 'Missing subscription_token_grants'; end if;
