@@ -34,6 +34,16 @@ export function getPhonePeConfig() {
   };
 }
 
+export function addCalendarMonth(date: Date) {
+  const result = new Date(date);
+  const day = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() + 1);
+  const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+  result.setDate(Math.min(day, lastDay));
+  return result;
+}
+
 export async function getPhonePeAccessToken() {
   const config = getPhonePeConfig();
   const body = new URLSearchParams({ client_id: config.clientId, client_version: config.clientVersion, client_secret: config.clientSecret, grant_type: "client_credentials" });
@@ -96,8 +106,7 @@ export async function settlePhonePeOrder(service: ReturnType<typeof getServiceCl
 
   const now = new Date();
   const periodStart = payment.payment_purpose === "renewal" && payment.billing_period_start ? new Date(payment.billing_period_start) : now;
-  const periodEnd = payment.payment_purpose === "renewal" && payment.billing_period_end ? new Date(payment.billing_period_end) : new Date(periodStart);
-  if (payment.payment_purpose !== "renewal") periodEnd.setMonth(periodEnd.getMonth() + 1);
+  const periodEnd = payment.payment_purpose === "renewal" && payment.billing_period_end ? new Date(payment.billing_period_end) : addCalendarMonth(periodStart);
   const nowIso = now.toISOString();
 
   if (payment.payment_purpose === "initial") {
@@ -116,7 +125,7 @@ export async function settlePhonePeOrder(service: ReturnType<typeof getServiceCl
     const { error: subError } = await service.from("user_subscriptions").update({
       current_period_start: periodStart.toISOString(), current_period_end: periodEnd.toISOString(),
       last_payment_at: nowIso, failed_payment_count: 0, next_renewal_notification_at: null, updated_at: nowIso,
-    }).eq("id", payment.user_subscription_id).eq("user_id", payment.user_id).eq("status", "active");
+    }).eq("id", payment.user_subscription_id).eq("user_id", payment.user_id).in("status", ["active", "cancel_at_period_end"]);
     if (subError) throw subError;
   }
 
