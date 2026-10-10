@@ -28,10 +28,15 @@ This is a **draft schema foundation** for monthly subscriptions. It is intention
 
 ## What this stage adds
 
-- Plan metadata for listing limits, premium features, feature flags, INR currency and PhonePe plan IDs.
+- Plan metadata for listing limits, premium features, feature flags, INR currency, PhonePe plan IDs, and separately configured monthly bonus tokens.
+- Offer configuration: the ₹10 plan grants 50 base tokens plus 5 clearly identified promotional tokens (55 total). PhonePe's processing fee is a RoomOra merchant expense, not a reduction in the customer's token entitlement. If the actual merchant fee differs from the assumed 2%, RoomOra's net revenue changes; token benefits stay as advertised.
 - Provider/customer IDs, cancellation state and payment lifecycle metadata on `user_subscriptions`.
 - Payment records, webhook-event idempotency, monthly token grant idempotency and an audit trail.
 - `grant_subscription_period_tokens(...)`, callable only by `service_role`, to grant each subscription period's tokens once.
+
+## ₹10 offer rule
+
+For the ₹10 monthly plan, configure `token_allowance = 50` and `monthly_bonus_tokens = 5`. After PhonePe confirms a successful payment server-side, the ledger records the 50 subscription tokens and 5 promotional tokens separately, while the idempotent grant record tracks 55 total. The user-facing notification should say: **“Payment successful! You received 50 subscription tokens + 5 bonus tokens. Total: 55 tokens 🎉”**. Do not tell users the gateway fee reduced their tokens; gateway fees are paid by RoomOra under this offer model.
 
 ## Not included yet
 
