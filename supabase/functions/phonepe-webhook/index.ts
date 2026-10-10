@@ -26,10 +26,15 @@ Deno.serve(async (req) => {
     const eventId = await sha256Hex(raw);
     const { error: eventError } = await service.from("subscription_webhook_events").insert({
       provider: "phonepe", provider_event_id: eventId, event_type: event,
-      signature_valid: true, payload: body, processed_at: new Date().toISOString(),
+      signature_valid: true, payload: body,
     });
-    if (eventError?.code === "23505") return Response.json({ received: true, duplicate: true }, { status: 200 });
-    if (eventError) throw eventError;
+    if (eventError?.code === "23505") {
+      const { data: priorEvent, error: priorError } = await service.from("subscription_webhook_events")
+        .select("processed_at").eq("provider", "phonepe").eq("provider_event_id", eventId).maybeSingle();
+      if (priorError) throw priorError;
+      if (priorEvent?.processed_at) return Response.json({ received: true, duplicate: true }, { status: 200 });
+      // A previous attempt failed before marking this event complete; retry processing it.
+    } else if (eventError) throw eventError;
 
     if (event === "checkout.order.completed" && payload.state === "COMPLETED") {
       await settlePhonePeOrder(service, merchantOrderId);
@@ -41,6 +46,8 @@ Deno.serve(async (req) => {
         if (payment.user_subscription_id) await service.from("user_subscriptions").update({ status: "expired", updated_at: new Date().toISOString() }).eq("id", payment.user_subscription_id).eq("status", "pending");
       }
     }
+    await service.from("subscription_webhook_events").update({ processed_at: new Date().toISOString(), processing_error: null })
+      .eq("provider", "phonepe").eq("provider_event_id", eventId);
     return Response.json({ received: true }, { status: 200 });
   } catch (_error) {
     // Do not leak configuration, credentials, or provider response details to the caller.
