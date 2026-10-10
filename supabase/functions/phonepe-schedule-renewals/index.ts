@@ -1,4 +1,4 @@
-import { getPhonePeSubscriptionStatus, getServiceClient, phonePeRequest } from "../_shared/phonepe.ts";
+import { addCalendarMonth, getPhonePeSubscriptionStatus, getServiceClient, phonePeRequest } from "../_shared/phonepe.ts";
 
 function constantTimeEquals(a: string, b: string) {
   if (a.length !== b.length) return false;
@@ -29,8 +29,7 @@ Deno.serve(async (req) => {
   for (const sub of subscriptions || []) {
     try {
       const periodStart = new Date(sub.current_period_end);
-      const periodEnd = new Date(periodStart);
-      periodEnd.setMonth(periodEnd.getMonth() + 1);
+      const periodEnd = addCalendarMonth(periodStart);
       const { data: plan, error: planError } = await service.from("subscription_plans")
         .select("monthly_price,active").eq("id", sub.plan_id).maybeSingle();
       if (planError || !plan?.active) {
