@@ -82,6 +82,19 @@ export async function settlePhonePeOrder(service: ReturnType<typeof getServiceCl
     throw new Error("PhonePe amount does not match the RoomOra order");
   }
 
+  // An already captured order must never restart the paid period on a repeated
+  // redirect or webhook delivery. Return the original grant without mutating it.
+  if (payment.status === "captured") {
+    const { data: existingGrant, error: existingGrantError } = await service
+      .from("subscription_token_grants")
+      .select("tokens_granted")
+      .eq("user_subscription_id", payment.user_subscription_id)
+      .eq("provider_invoice_id", merchantOrderId)
+      .maybeSingle();
+    if (existingGrantError) throw existingGrantError;
+    if (existingGrant) return { state: "completed", tokensGranted: Number(existingGrant.tokens_granted || 0), alreadyGranted: true };
+  }
+
   if (statusData.state === "PENDING") return { state: "pending", tokensGranted: 0 };
   if (statusData.state === "FAILED") {
     await service.from("subscription_payments").update({
