@@ -108,3 +108,113 @@ footer{background:rgba(238,242,235,.62)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .topbar,.dash-top,.dash-sidebar,.dash-panel,.market-image-card,.auth-modal{background:rgba(248,250,246,.96)!important}
 }
+
+
+/* Project-wide surface pass: shared by every dashboard, marketplace, admin and account view. */
+:root{
+  --glass-bg-soft:rgba(255,255,255,.48);
+  --glass-bg-card:rgba(255,255,255,.68);
+  --glass-stroke:rgba(255,255,255,.78);
+  --glass-text:#1b2b21;
+  --glass-muted:#637168;
+}
+body, #root, .app{min-height:100%;color:var(--glass-text)}
+/* All recurring card and summary patterns across feature modules. */
+[class$="-card"],[class*="-card "],[class^="stat-"],[class*=" stat-"],
+.dash-stat,.dash-stat-card,.dash-metric,.dash-summary,.dash-summary-card,
+.dash-section,.dash-widget,.dash-table-wrap,.dash-chart-wrap,.dash-activity,
+.workspace-card,.workspace-panel,.workspace-stat,.workspace-stat-card,
+.admin-card,.admin-stat,.admin-metric,.analytics-card,.analytics-stat,
+.token-card,.token-balance-card,.subscription-card,.subscription-plan,
+.subscription-plan-card,.subscription-balance,.subscription-history-card,
+.listing-row,.listing-item,.saved-item,.saved-item-card,.my-listing-card,
+.publish-form,.publish-panel,.profile-panel,.profile-card,.settings-panel,
+.contact-card,.inquiry-card,.order-card,.activity-card,.history-card,
+.stat-card,.metric-card,.summary-card,.data-card,.content-card,.feature-tile{
+  background:var(--glass-bg-card)!important;
+  border:1px solid var(--glass-stroke)!important;
+  box-shadow:var(--glass-shadow)!important;
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(140%);
+  backdrop-filter:blur(var(--glass-blur)) saturate(140%);
+  background-clip:padding-box;
+}
+[class$="-card"],[class*="-card "],.dash-stat,.dash-stat-card,.dash-metric,
+.admin-card,.analytics-card,.token-card,.subscription-card,.stat-card,.metric-card,.summary-card{
+  border-radius:var(--glass-radius);
+}
+/* Dashboard modules and wide content surfaces. */
+.dash-content,.dash-overview,.dash-workspace,.workspace-content,
+.marketplace-content,.marketplace-panel,.marketplace-owner-grid,
+.admin-analytics,.admin-analytics-content,.analytics-layout,.subscription-manager,
+.saved-items-layout,.my-listings-layout,.publish-item-layout{
+  background:transparent!important;
+}
+.dash-table-wrap,.table-wrap,.data-table-wrap,.analytics-table-wrap,
+.workspace-table-wrap,.marketplace-table-wrap{
+  border:1px solid var(--glass-stroke)!important;border-radius:14px;overflow:auto;
+  background:var(--glass-bg-soft)!important;box-shadow:var(--glass-shadow);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+}
+table{border-collapse:separate;border-spacing:0}
+thead th{background:rgba(224,237,226,.7)!important;color:#314a39}
+tbody tr{background:rgba(255,255,255,.28)}
+tbody tr:hover{background:rgba(220,238,225,.48)}
+td,th{border-color:rgba(72,101,81,.12)!important}
+/* Popovers, dropdowns, confirmation dialogs and floating menus. */
+[role="dialog"],[role="menu"],[role="listbox"],.dropdown-menu,.dash-dropdown,
+.dash-popover,.popover,.tooltip-card,.context-menu,.filter-popover,
+.market-filter-menu,.select-menu,.notification-panel,.profile-dropdown,
+.modal-card,.dialog-card,.confirm-dialog,.toast,.notice,.auth-message{
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+  backdrop-filter:blur(18px) saturate(145%);
+}
+[role="dialog"],.dropdown-menu,.dash-dropdown,.dash-popover,.popover,
+.context-menu,.filter-popover,.select-menu,.notification-panel,.profile-dropdown,
+.modal-card,.dialog-card,.confirm-dialog{
+  background:rgba(249,252,248,.92)!important;
+  border:1px solid rgba(255,255,255,.86)!important;
+  box-shadow:0 22px 60px rgba(27,48,34,.17),inset 0 1px 0 rgba(255,255,255,.82);
+  border-radius:16px;
+}
+.modal-backdrop{z-index:1000}
+.auth-modal,[role="dialog"]{color:var(--glass-text)}
+/* Form fields across publishing, profile, subscriptions and search. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,textarea,.form-control,.field-control,.search-input{
+  background:rgba(255,255,255,.76)!important;
+  border:1px solid rgba(80,112,89,.2)!important;
+  border-radius:10px;
+  color:var(--glass-text);
+}
+input::placeholder,textarea::placeholder{color:#77847a}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,
+a:focus-visible,[role="button"]:focus-visible{
+  outline:3px solid rgba(73,139,96,.28);outline-offset:2px;
+}
+button:disabled{opacity:.58;cursor:not-allowed;transform:none!important}
+/* Buttons stay readable against translucent surfaces. */
+.dash-primary,.dash-action,.primary-button,.btn-primary,.button-primary,
+.publish-submit,.save-button,.auth-submit,.search-btn,.nav-cta{
+  color:#fff!important;
+}
+.dash-secondary,.btn-secondary,.button-secondary,.ghost-button,.icon-button{
+  background:rgba(255,255,255,.64)!important;
+  border-color:rgba(255,255,255,.88)!important;
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+}
+/* Keep large images crisp while the surrounding card remains frosted. */
+.market-image-card-media img,.listing-image img,.room-image img,.product-image img,
+.saved-item img,.my-listing-card img{display:block;max-width:100%}
+img{border-radius:inherit}
+hr{border:0;border-top:1px solid rgba(72,101,81,.14)}
+::selection{background:rgba(98,158,116,.24);color:#173324}
+@media(max-width:680px){
+  [class$="-card"],[class*="-card "],.dash-stat,.dash-stat-card,.dash-metric,
+  .admin-card,.analytics-card,.token-card,.subscription-card,.stat-card,.metric-card,.summary-card{
+    border-radius:13px;
+  }
+  [role="dialog"],.modal-card,.dialog-card,.confirm-dialog{max-width:calc(100vw - 24px)}
+}
+@media(prefers-reduced-transparency:reduce){
+  :root{--glass-bg:rgba(255,255,255,.94);--glass-bg-strong:rgba(255,255,255,.97);--glass-bg-card:rgba(255,255,255,.95);--glass-blur:4px}
+}
