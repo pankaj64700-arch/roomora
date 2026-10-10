@@ -6,11 +6,15 @@ alter table public.subscription_plans
   add column if not exists description text,
   add column if not exists currency text not null default 'INR',
   add column if not exists monthly_listing_limit integer,
+  add column if not exists monthly_bonus_tokens integer not null default 0,
   add column if not exists premium_features jsonb not null default '[]'::jsonb,
   add column if not exists feature_flags jsonb not null default '{}'::jsonb,
   add column if not exists phonepe_plan_id text;
 
 do $$ begin
+  if not exists (select 1 from pg_constraint where conrelid='public.subscription_plans'::regclass and conname='subscription_plans_bonus_tokens_nonnegative') then
+    alter table public.subscription_plans add constraint subscription_plans_bonus_tokens_nonnegative check (monthly_bonus_tokens >= 0);
+  end if;
   if not exists (select 1 from pg_constraint where conrelid='public.subscription_plans'::regclass and conname='subscription_plans_listing_limit_nonnegative') then
     alter table public.subscription_plans add constraint subscription_plans_listing_limit_nonnegative check (monthly_listing_limit is null or monthly_listing_limit >= 0);
   end if;
@@ -132,17 +136,17 @@ create or replace function public.grant_subscription_period_tokens(
  p_user_subscription_id uuid, p_period_start timestamptz, p_period_end timestamptz, p_provider_invoice_id text default null
 ) returns boolean
 language plpgsql security definer set search_path='' as $$
-declare v_sub record; v_tokens integer; v_grant_id uuid; v_transaction_id uuid;
+declare v_sub record; v_tokens integer; v_bonus_tokens integer; v_grant_id uuid; v_transaction_id uuid;
 begin
  if p_period_start is null or p_period_end is null or p_period_end<=p_period_start then raise exception 'Invalid subscription billing period'; end if;
  select us.id,us.user_id,us.plan_id,us.status into v_sub
  from public.user_subscriptions us where us.id=p_user_subscription_id for update;
  if v_sub.id is null then raise exception 'Subscription not found'; end if;
  if v_sub.status not in ('active','cancel_at_period_end') then raise exception 'Subscription is not eligible for token allocation'; end if;
- select sp.token_allowance into v_tokens from public.subscription_plans sp where sp.id=v_sub.plan_id and sp.active=true;
- if v_tokens is null then raise exception 'Subscription plan is unavailable'; end if;
+ select sp.token_allowance,sp.monthly_bonus_tokens into v_tokens,v_bonus_tokens from public.subscription_plans sp where sp.id=v_sub.plan_id and sp.active=true;
+ if v_tokens is null or v_bonus_tokens is null then raise exception 'Subscription plan is unavailable'; end if;
  insert into public.subscription_token_grants(user_subscription_id,user_id,period_start,period_end,tokens_granted,provider_invoice_id)
- values(v_sub.id,v_sub.user_id,p_period_start,p_period_end,v_tokens,nullif(trim(p_provider_invoice_id),''))
+ values(v_sub.id,v_sub.user_id,p_period_start,p_period_end,v_tokens+v_bonus_tokens,nullif(trim(p_provider_invoice_id),''))
  on conflict do nothing returning id into v_grant_id;
  if v_grant_id is null then return false; end if;
  if v_tokens>0 then
@@ -152,9 +156,14 @@ begin
    returning id into v_transaction_id;
    update public.subscription_token_grants set token_transaction_id=v_transaction_id where id=v_grant_id;
  end if;
+ if v_bonus_tokens>0 then
+   insert into public.token_transactions(user_id,amount,transaction_type,reference_id,description)
+   values(v_sub.user_id,v_bonus_tokens,'premium_monthly',v_sub.id,
+     format('PhonePe subscription promotional bonus (%s tokens; %s to %s)',v_bonus_tokens,p_period_start,p_period_end));
+ end if;
  insert into public.subscription_audit_log(user_id,user_subscription_id,actor,action,details)
  values(v_sub.user_id,v_sub.id,'phonepe','monthly_tokens_granted',
-   jsonb_build_object('tokens',v_tokens,'period_start',p_period_start,'period_end',p_period_end,'provider_invoice_id',p_provider_invoice_id));
+   jsonb_build_object('base_tokens',v_tokens,'bonus_tokens',v_bonus_tokens,'total_tokens',v_tokens+v_bonus_tokens,'period_start',p_period_start,'period_end',p_period_end,'provider_invoice_id',p_provider_invoice_id));
  return true;
 end $$;
 revoke all on function public.grant_subscription_period_tokens(uuid,timestamptz,timestamptz,text) from public,anon,authenticated;
