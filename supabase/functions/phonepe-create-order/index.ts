@@ -34,13 +34,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: "This plan does not require a payment" }, { status: 400, headers });
     }
     const { data: existing, error: existingError } = await service.from("user_subscriptions")
-      .select("id,status,current_period_end")
+      .select("id,status,current_period_end,created_at")
       .eq("user_id", user.id).in("status", ["active", "cancel_at_period_end", "pending"])
       .gt("current_period_end", new Date().toISOString()).limit(1).maybeSingle();
     if (existingError) throw existingError;
-    if (existing) return Response.json({ error: existing.status === "pending"
-      ? "You already have a subscription checkout in progress. Finish it or wait for it to expire before trying again."
-      : "You already have an active subscription. Manage it before choosing another plan." }, { status: 409, headers });
+    if (existing?.status === "pending" && new Date(existing.created_at).getTime() < Date.now() - 20 * 60 * 1000) {
+      await service.from("user_subscriptions").update({ status: "expired", updated_at: new Date().toISOString() }).eq("id", existing.id).eq("status", "pending");
+    } else if (existing) {
+      return Response.json({ error: existing.status === "pending"
+        ? "You already have a subscription checkout in progress. Finish it or wait 20 minutes before trying again."
+        : "You already have an active subscription. Manage it before choosing another plan." }, { status: 409, headers });
+    }
 
     const siteUrl = Deno.env.get("ROOMORA_SITE_URL");
     if (!siteUrl) throw new Error("ROOMORA_SITE_URL is not configured");
