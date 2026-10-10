@@ -11,3 +11,25 @@ do $$ begin
  if not exists(select 1 from pg_constraint where conrelid='public.user_subscriptions'::regclass and conname='user_subscriptions_status_check') then raise exception 'Missing lifecycle status constraint'; end if;
  raise notice 'RoomOra subscription Stage 1 schema checks passed';
 end $$;
+
+-- Behavioral test: token grants are idempotent per billing period and invoice.
+begin;
+insert into auth.users(id) values ('00000000-0000-4000-8000-000000000101');
+insert into public.profiles(id,is_admin) values ('00000000-0000-4000-8000-000000000101',false);
+insert into public.subscription_plans(id,name,monthly_price,token_allowance,active)
+ values ('00000000-0000-4000-8000-000000000201','CI Subscription Plan',199,25,true);
+insert into public.user_subscriptions(id,user_id,plan_id,status,current_period_start,current_period_end)
+ values ('00000000-0000-4000-8000-000000000301','00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000201','active','2026-10-01T00:00:00Z','2026-11-01T00:00:00Z');
+do $$
+declare first_result boolean; second_result boolean; total_tokens integer; grant_count integer;
+begin
+ first_result := public.grant_subscription_period_tokens('00000000-0000-4000-8000-000000000301','2026-10-01T00:00:00Z','2026-11-01T00:00:00Z','ci-invoice-1');
+ second_result := public.grant_subscription_period_tokens('00000000-0000-4000-8000-000000000301','2026-10-01T00:00:00Z','2026-11-01T00:00:00Z','ci-invoice-1');
+ if first_result is distinct from true then raise exception 'First token grant should succeed'; end if;
+ if second_result is distinct from false then raise exception 'Duplicate token grant should be ignored'; end if;
+ select count(*) into total_tokens from public.token_transactions where user_id='00000000-0000-4000-8000-000000000101' and transaction_type='premium_monthly' and amount=25;
+ select count(*) into grant_count from public.subscription_token_grants where user_subscription_id='00000000-0000-4000-8000-000000000301';
+ if total_tokens <> 1 then raise exception 'Expected exactly one premium token transaction, got %',total_tokens; end if;
+ if grant_count <> 1 then raise exception 'Expected exactly one token grant row, got %',grant_count; end if;
+end $$;
+rollback;
