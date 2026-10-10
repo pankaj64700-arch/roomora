@@ -28,6 +28,18 @@ jobs:
           --health-retries 12
     steps:
       - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check PhonePe Edge Functions
+        run: >-
+          deno check
+          supabase/functions/phonepe-create-order/index.ts
+          supabase/functions/phonepe-verify-order/index.ts
+          supabase/functions/phonepe-webhook/index.ts
+          supabase/functions/phonepe-schedule-renewals/index.ts
+          supabase/functions/phonepe-cancel-subscription/index.ts
+          supabase/functions/phonepe-subscription-status/index.ts
       - name: Apply disposable RoomOra baseline
         env:
           PGPASSWORD: postgres
