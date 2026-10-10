@@ -40,20 +40,21 @@ For the ₹10 monthly plan, configure `token_allowance = 50` and `monthly_bonus_
 
 ## Not included yet
 
-- No PhonePe checkout creation or webhook endpoint.
-- No UI activation on checkout return. Only a verified server-side PhonePe webhook/status check should activate or renew a subscription.
+- PhonePe Standard Checkout order creation and order-status verification functions are added in `supabase/functions/phonepe-create-order` and `supabase/functions/phonepe-verify-order`.
+- An authenticated webhook handler is added in `supabase/functions/phonepe-webhook`; configure the exact authentication format supported by the merchant portal and verify against the current PhonePe docs before production.
+- The subscriptions panel now invokes checkout and displays the 55-token launch offer and success notice. This is not live until functions are deployed, credentials configured, and the migration is applied to a development database.
 - No listing-limit enforcement in `publish_item(...)` yet; that must be a separate migration after carefully preserving its existing behavior.
 - No production migration has been applied and no payment credentials are required for this stage.
 
 ## Next stages
 
-1. Confirm PhonePe merchant onboarding, promotional pricing eligibility, and UPI AutoPay access.
-2. Add server-side PhonePe order/subscription creation using secrets stored in Supabase Edge Function secrets.
-3. Verify webhook signatures and reconcile payment status with PhonePe's server-side status API; process provider event IDs idempotently.
-4. Add atomic lifecycle transitions and verified monthly token grants.
-5. Enforce listing limits and premium entitlements in trusted database functions.
-6. Wire `SubscriptionsPanel` and the admin plan editor.
-7. Test the complete lifecycle in PhonePe's supported test environment before production rollout.
+1. Confirm PhonePe merchant onboarding and test credentials.
+2. Configure secrets: `PHONEPE_CLIENT_ID`, `PHONEPE_CLIENT_SECRET`, `PHONEPE_CLIENT_VERSION`, `PHONEPE_ENV=sandbox`, `ROOMORA_SITE_URL`, `ROOMORA_ALLOWED_ORIGINS`, `PHONEPE_WEBHOOK_USERNAME`, and `PHONEPE_WEBHOOK_PASSWORD`. Use Supabase function secrets, never frontend environment variables.
+3. Deploy the three functions and configure PhonePe's webhook URL.
+4. Validate the checkout, failed payment, delayed payment, duplicate webhook, and 55-token grant in PhonePe's sandbox.
+5. Confirm PhonePe AutoPay is enabled for the merchant and implement/test mandate setup and renewal before describing subscriptions as automatic recurring billing.
+6. Apply the migration to development, run the SQL tests, and only then plan a production rollout.
+7. Enforce listing limits and premium entitlements in trusted database functions.
 
 ## Official references
 
