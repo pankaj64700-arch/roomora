@@ -8,18 +8,21 @@
 - RoomOra absorbs the gateway fee; the user's advertised token allocation does not shrink.
 
 ## Implemented in this branch
-- PhonePe Standard Checkout initial order and server-side order-status verification.
-- Additional migration fields for PhonePe AutoPay mandate IDs and renewal-period payment tracking.
-- The subscriptions panel shows the 55-token offer and success notice.
+- PhonePe UPI AutoPay mandate setup via PhonePe Standard Checkout's documented `SUBSCRIPTION_CHECKOUT_SETUP` flow.
+- Server-side initial order verification plus a PhonePe subscription-status check before activation and token grants.
+- A trusted renewal scheduler that checks mandate state and submits the documented redemption-notification request with `autoDebit: true` and `STANDARD` retries 24–48 hours before period end.
+- Webhook processing for setup, redemption, and mandate-state events with duplicate-event protection.
+- Authenticated subscription-status and cancellation functions, plus a user-facing cancellation control.
+- Additional migration fields and a unique index for one renewal order per billing period.
+- The subscriptions panel shows the 55-token offer, payment-success notice, current subscription status, and AutoPay cancellation.
 
-## AutoPay implementation still required
-Before claiming automatic renewal, implement and test all of these against PhonePe's current official merchant docs:
-1. Create the recurring mandate using the PhonePe AutoPay setup flow, with a unique merchant subscription ID, approved monthly frequency and UPI mandate.
-2. Verify setup and initial payment with PhonePe's server-side status API. Grant the first 55 tokens only after confirmed successful payment.
-3. Add a trusted scheduled renewal worker that checks mandate status, sends any required pre-debit notice, and submits the monthly redemption using the provider's documented API.
-4. Grant renewal tokens only after the authenticated webhook arrives and PhonePe's server-side redemption status confirms payment.
-5. Handle duplicate callbacks, failed redemptions, retries, paused/revoked mandates, cancellation, refunds and reconciliation idempotently.
-6. Add a user-facing cancellation flow and ensure cancel-at-period-end is respected.
+## Remaining before production
+The code is a draft integration and has not been deployed. Complete these tests against PhonePe's current official merchant docs before enabling real billing:
+1. Test mandate setup and initial payment, including a successful server-side subscription status check before granting the first 55 tokens.
+2. Configure and test the trusted scheduler's daily invocation and secret.
+3. Test renewal success/failure, delayed and duplicate callbacks, paused/revoked mandates, cancellation, refunds, and manual reconciliation.
+4. Confirm the required customer notice timing and recurring debit behavior in PhonePe's UAT environment; verify the merchant account is enabled for AutoPay.
+5. Add operational monitoring/alerts for renewal notification failures and subscriptions requiring manual reconciliation.
 
 ## Secrets (Supabase Edge Function secrets only)
 - `PHONEPE_CLIENT_ID`
