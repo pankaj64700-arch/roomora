@@ -16,7 +16,7 @@ export default function SubscriptionsPanel({plans=[],tokenBalance=0,onRefresh=()
    const {data,error}=await supabase.functions.invoke('phonepe-verify-order',{body:{merchantOrderId:orderId}});
    if(error)throw error;
    if(data?.state==='completed'){
-    setNotice({kind:'success',title:'Payment successful!',message:'You received 50 subscription tokens + 5 bonus tokens. Total: 55 tokens 🎉'});
+    setNotice({kind:'success',title:'Payment successful!',message:Number(data.tokensGranted)===55?'You received 50 subscription tokens + 5 bonus tokens. Total: 55 tokens 🎉':`You received ${data.tokensGranted} tokens. Your subscription is active. 🎉`});
     await onRefresh();
     const url=new URL(window.location.href);url.searchParams.delete('phonepe_order');window.history.replaceState({},'',url);
    }else if(data?.state==='failed'){
