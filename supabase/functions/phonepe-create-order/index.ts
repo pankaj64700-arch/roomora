@@ -46,8 +46,10 @@ Deno.serve(async (req) => {
     if (!siteUrl) throw new Error("ROOMORA_SITE_URL is not configured");
     const now = new Date();
     const periodEnd = new Date(now); periodEnd.setMonth(periodEnd.getMonth() + 1);
+    const merchantSubscriptionId = `RMS_${crypto.randomUUID().replaceAll("-", "")}`;
     const { data: subscription, error: subError } = await service.from("user_subscriptions").insert({
       user_id: user.id, plan_id: plan.id, status: "pending", billing_provider: "phonepe",
+      phonepe_merchant_subscription_id: merchantSubscriptionId,
       started_at: now.toISOString(), current_period_start: now.toISOString(), current_period_end: periodEnd.toISOString(),
     }).select("id").single();
     if (subError) throw subError;
@@ -55,7 +57,9 @@ Deno.serve(async (req) => {
     const merchantOrderId = `RM_${crypto.randomUUID().replaceAll("-", "")}`;
     const { error: paymentError } = await service.from("subscription_payments").insert({
       user_id: user.id, user_subscription_id: subscription.id, provider: "phonepe",
-      provider_invoice_id: merchantOrderId, amount_minor: amountMinor, currency: "INR", status: "created",
+      provider_invoice_id: merchantOrderId, provider_subscription_id: merchantSubscriptionId,
+      amount_minor: amountMinor, currency: "INR", status: "created", payment_purpose: "initial",
+      billing_period_start: now.toISOString(), billing_period_end: periodEnd.toISOString(),
     });
     if (paymentError) {
       await service.from("user_subscriptions").update({ status: "expired", updated_at: new Date().toISOString() }).eq("id", subscription.id);
@@ -75,9 +79,18 @@ Deno.serve(async (req) => {
           amount: amountMinor,
           expireAfter: 1200,
           paymentFlow: {
-            type: "PG_CHECKOUT",
-            message: `RoomOra ${plan.name} monthly subscription`,
+            type: "SUBSCRIPTION_CHECKOUT_SETUP",
             merchantUrls: { redirectUrl: redirectUrl.toString() },
+            subscriptionDetails: {
+              subscriptionType: "RECURRING",
+              merchantSubscriptionId,
+              authWorkflowType: "TRANSACTION",
+              amountType: "FIXED",
+              maxAmount: amountMinor,
+              frequency: "MONTHLY",
+              productType: "UPI_MANDATE",
+              expireAt: Date.now() + (10 * 365 * 24 * 60 * 60 * 1000),
+            },
           },
           metaInfo: { udf1: user.id, udf2: plan.id, udf3: "roomora_subscription" },
         }),
@@ -86,7 +99,8 @@ Deno.serve(async (req) => {
       if (!phonePeResponse.ok || !result.redirectUrl) {
         throw new Error("PhonePe could not create the checkout session. Verify your PhonePe merchant credentials and enable Standard Checkout.");
       }
-      return Response.json({ redirectUrl: result.redirectUrl, merchantOrderId, amount: amountMinor, tokens: Number(plan.token_allowance || 0) + Number(plan.monthly_bonus_tokens || 0) }, { headers });
+      await service.from("subscription_payments").update({ provider_payment_id: result.orderId || null, updated_at: new Date().toISOString() }).eq("provider_invoice_id", merchantOrderId);
+      return Response.json({ redirectUrl: result.redirectUrl, merchantOrderId, merchantSubscriptionId, amount: amountMinor, tokens: Number(plan.token_allowance || 0) + Number(plan.monthly_bonus_tokens || 0) }, { headers });
     } catch (error) {
       await service.from("subscription_payments").update({ status: "failed", failure_description: "PhonePe checkout creation failed", updated_at: new Date().toISOString() }).eq("provider_invoice_id", merchantOrderId);
       await service.from("user_subscriptions").update({ status: "expired", updated_at: new Date().toISOString() }).eq("id", subscription.id);
