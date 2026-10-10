@@ -1,6 +1,6 @@
 # RoomOra subscription billing — Stage 1
 
-This is a **draft schema foundation** for monthly subscriptions. It is intentionally additive and does not activate payments or change the existing publish flow. The selected payment provider is **PhonePe Payment Gateway**.
+This is a **draft PhonePe Standard Checkout integration**. It does not activate live payments or change the existing publish flow. The initial checkout charges for one monthly plan period; **automatic renewal via PhonePe AutoPay is not implemented yet**, so do not market or deploy this as an automatically recurring subscription until the AutoPay mandate, redemption/renewal, cancellation, and reconciliation flow is completed.
 
 ## Provider and cost assumptions
 
@@ -42,7 +42,7 @@ For the ₹10 monthly plan, configure `token_allowance = 50` and `monthly_bonus_
 
 - PhonePe Standard Checkout order creation and order-status verification functions are added in `supabase/functions/phonepe-create-order` and `supabase/functions/phonepe-verify-order`.
 - An authenticated webhook handler is added in `supabase/functions/phonepe-webhook`; configure the exact authentication format supported by the merchant portal and verify against the current PhonePe docs before production.
-- The subscriptions panel now invokes checkout and displays the 55-token launch offer and success notice. This is not live until functions are deployed, credentials configured, and the migration is applied to a development database.
+- The subscriptions panel now invokes checkout and displays the 55-token launch offer and success notice. This is not live until functions are deployed, credentials configured, and the migration is applied to a development database. Standard Checkout is a one-time payment flow; automatic renewal via PhonePe AutoPay remains a required follow-up.
 - No listing-limit enforcement in `publish_item(...)` yet; that must be a separate migration after carefully preserving its existing behavior.
 - No production migration has been applied and no payment credentials are required for this stage.
 
@@ -52,7 +52,7 @@ For the ₹10 monthly plan, configure `token_allowance = 50` and `monthly_bonus_
 2. Configure secrets: `PHONEPE_CLIENT_ID`, `PHONEPE_CLIENT_SECRET`, `PHONEPE_CLIENT_VERSION`, `PHONEPE_ENV=sandbox`, `ROOMORA_SITE_URL`, `ROOMORA_ALLOWED_ORIGINS`, `PHONEPE_WEBHOOK_USERNAME`, and `PHONEPE_WEBHOOK_PASSWORD`. Use Supabase function secrets, never frontend environment variables.
 3. Deploy the three functions and configure PhonePe's webhook URL.
 4. Validate the checkout, failed payment, delayed payment, duplicate webhook, and 55-token grant in PhonePe's sandbox.
-5. Confirm PhonePe AutoPay is enabled for the merchant and implement/test mandate setup and renewal before describing subscriptions as automatic recurring billing.
+5. Confirm PhonePe AutoPay is enabled for the merchant and implement/test mandate setup, recurring redemption, renewal, cancellation, failed-redemption recovery, and webhook handling before describing subscriptions as automatic recurring billing.
 6. Apply the migration to development, run the SQL tests, and only then plan a production rollout.
 7. Enforce listing limits and premium entitlements in trusted database functions.
 
