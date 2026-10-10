@@ -48,7 +48,7 @@ For the ₹10 monthly plan, configure `token_allowance = 50` and `monthly_bonus_
 
 ## Next stages
 
-1. Confirm PhonePe merchant onboarding and test credentials.
+1. Confirm PhonePe merchant onboarding and test credentials. The migration configures 5 bonus tokens for active ₹10 plans that include 50 base tokens.
 2. Configure secrets: `PHONEPE_CLIENT_ID`, `PHONEPE_CLIENT_SECRET`, `PHONEPE_CLIENT_VERSION`, `PHONEPE_ENV=sandbox`, `ROOMORA_SITE_URL`, `ROOMORA_ALLOWED_ORIGINS`, `PHONEPE_WEBHOOK_USERNAME`, and `PHONEPE_WEBHOOK_PASSWORD`. Use Supabase function secrets, never frontend environment variables.
 3. Deploy the three functions and configure PhonePe's webhook URL.
 4. Validate the checkout, failed payment, delayed payment, duplicate webhook, and 55-token grant in PhonePe's sandbox.
