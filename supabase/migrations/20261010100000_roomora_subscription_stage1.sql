@@ -169,4 +169,11 @@ end $$;
 revoke all on function public.grant_subscription_period_tokens(uuid,timestamptz,timestamptz,text) from public,anon,authenticated;
 grant execute on function public.grant_subscription_period_tokens(uuid,timestamptz,timestamptz,text) to service_role;
 
+-- Configure the agreed launch offer for existing ₹10 / 50-token plans.
+-- The gateway fee is absorbed by RoomOra; advertised tokens do not change.
+update public.subscription_plans
+set monthly_bonus_tokens = 5,
+    description = coalesce(description, '₹10 monthly plan: 50 subscription tokens + 5 promotional bonus tokens')
+where active = true and monthly_price = 10 and token_allowance = 50;
+
 commit;
