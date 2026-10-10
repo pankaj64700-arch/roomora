@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
       if (priorEvent?.processed_at) return Response.json({ received: true, duplicate: true }, { status: 200 });
     } else if (eventError) throw eventError;
 
-    const isOrderEvent = event.includes(".order.") || event.startsWith("checkout.order.");
+    const isOrderEvent = event.includes(".order.") || event.includes(".transaction.") || event.startsWith("checkout.order.");
     if (isOrderEvent && merchantOrderId && (event.endsWith(".completed") || event.endsWith(".failed"))) {
       if (event.endsWith(".completed")) await settlePhonePeOrder(service, merchantOrderId);
       else {
