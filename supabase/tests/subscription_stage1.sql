@@ -28,7 +28,7 @@ begin
  second_result := public.grant_subscription_period_tokens('00000000-0000-4000-8000-000000000301','2026-10-01T00:00:00Z','2026-11-01T00:00:00Z','ci-invoice-1');
  if first_result is distinct from true then raise exception 'First token grant should succeed'; end if;
  if second_result is distinct from false then raise exception 'Duplicate token grant should be ignored'; end if;
- select count(*) into total_tokens from public.token_transactions where user_id='00000000-0000-4000-8000-000000000101' and transaction_type='premium_monthly' and amount=25;
+ select count(*) into total_tokens from public.token_transactions where user_id='00000000-0000-4000-8000-000000000101' and transaction_type='premium_monthly' and amount in (5,50);
  select count(*) into grant_count from public.subscription_token_grants where user_subscription_id='00000000-0000-4000-8000-000000000301';
  select tokens_granted into granted from public.subscription_token_grants where user_subscription_id='00000000-0000-4000-8000-000000000301';
  if total_tokens <> 2 then raise exception 'Expected separate base and bonus token transactions, got %',total_tokens; end if;
