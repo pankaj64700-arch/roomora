@@ -8,7 +8,7 @@ alter table public.subscription_plans
   add column if not exists monthly_listing_limit integer,
   add column if not exists premium_features jsonb not null default '[]'::jsonb,
   add column if not exists feature_flags jsonb not null default '{}'::jsonb,
-  add column if not exists razorpay_plan_id text;
+  add column if not exists phonepe_plan_id text;
 
 do $$ begin
   if not exists (select 1 from pg_constraint where conrelid='public.subscription_plans'::regclass and conname='subscription_plans_listing_limit_nonnegative') then
@@ -27,8 +27,8 @@ end $$;
 
 alter table public.user_subscriptions
   add column if not exists billing_provider text not null default 'manual',
-  add column if not exists razorpay_subscription_id text,
-  add column if not exists razorpay_customer_id text,
+  add column if not exists phonepe_subscription_id text,
+  add column if not exists phonepe_customer_id text,
   add column if not exists cancel_at_period_end boolean not null default false,
   add column if not exists cancelled_at timestamptz,
   add column if not exists last_payment_at timestamptz,
@@ -37,7 +37,7 @@ alter table public.user_subscriptions
 
 do $$ begin
   if not exists (select 1 from pg_constraint where conrelid='public.user_subscriptions'::regclass and conname='user_subscriptions_billing_provider_check') then
-    alter table public.user_subscriptions add constraint user_subscriptions_billing_provider_check check (billing_provider in ('manual','razorpay'));
+    alter table public.user_subscriptions add constraint user_subscriptions_billing_provider_check check (billing_provider in ('manual','phonepe'));
   end if;
 end $$;
 
@@ -50,14 +50,14 @@ do $$ begin
   end if;
 end $$;
 
-create unique index if not exists user_subscriptions_razorpay_subscription_uidx on public.user_subscriptions(razorpay_subscription_id) where razorpay_subscription_id is not null;
+create unique index if not exists user_subscriptions_phonepe_subscription_uidx on public.user_subscriptions(phonepe_subscription_id) where phonepe_subscription_id is not null;
 create index if not exists user_subscriptions_user_status_period_idx on public.user_subscriptions(user_id,status,current_period_end desc);
 
 create table if not exists public.subscription_payments (
  id uuid primary key default gen_random_uuid(),
  user_id uuid not null references auth.users(id) on delete cascade,
  user_subscription_id uuid references public.user_subscriptions(id) on delete set null,
- provider text not null default 'razorpay' check(provider='razorpay'),
+ provider text not null default 'phonepe' check(provider='phonepe'),
  provider_payment_id text, provider_invoice_id text, provider_subscription_id text,
  amount_minor bigint not null check(amount_minor>=0),
  currency text not null default 'INR' check(currency='INR'),
@@ -71,7 +71,7 @@ create index if not exists subscription_payments_user_created_idx on public.subs
 
 create table if not exists public.subscription_webhook_events (
  id uuid primary key default gen_random_uuid(),
- provider text not null default 'razorpay' check(provider='razorpay'),
+ provider text not null default 'phonepe' check(provider='phonepe'),
  provider_event_id text not null, event_type text not null,
  signature_valid boolean not null default false, payload jsonb not null,
  received_at timestamptz not null default now(), processed_at timestamptz, processing_error text,
@@ -98,7 +98,7 @@ create table if not exists public.subscription_audit_log (
  id uuid primary key default gen_random_uuid(),
  user_id uuid references auth.users(id) on delete set null,
  user_subscription_id uuid references public.user_subscriptions(id) on delete set null,
- actor text not null check(actor in ('system','user','admin','razorpay')),
+ actor text not null check(actor in ('system','user','admin','phonepe')),
  action text not null, details jsonb not null default '{}'::jsonb,
  created_at timestamptz not null default now()
 );
@@ -153,7 +153,7 @@ begin
    update public.subscription_token_grants set token_transaction_id=v_transaction_id where id=v_grant_id;
  end if;
  insert into public.subscription_audit_log(user_id,user_subscription_id,actor,action,details)
- values(v_sub.user_id,v_sub.id,'razorpay','monthly_tokens_granted',
+ values(v_sub.user_id,v_sub.id,'phonepe','monthly_tokens_granted',
    jsonb_build_object('tokens',v_tokens,'period_start',p_period_start,'period_end',p_period_end,'provider_invoice_id',p_provider_invoice_id));
  return true;
 end $$;
