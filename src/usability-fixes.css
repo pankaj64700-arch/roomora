@@ -108,3 +108,12 @@ html, body, #root { min-width: 320px; }
   :root { --ro-page-gutter: 12px; --ro-card-gap: 10px; }
   .market-landing-head { padding-top: 12px; }
 }
+
+
+/* Zero vertical seams between header/hero/content; gutters remain horizontal. */
+.market-landing-head { padding-top: 0; }
+.market-head { padding-top: 0; }
+.dash-hero { padding-top: 0; }
+.market-landing .market-filters { margin-top: 0; }
+.market-landing-head + .market-filters,
+.market-landing-head + .landing-filters { margin-top: 0; }
