@@ -286,3 +286,42 @@ A design change is not complete until it considers:
 - reuse opportunities
 - no unnecessary duplicated CSS
 - no accidental regression of existing flows
+
+
+## 26. Spacing contract — page, section, and card rhythm
+
+RoomOra uses three distinct spacing responsibilities. Do not mix them together.
+
+### Page gutter
+The page gutter is the horizontal space between the viewport edge and the main content container. It belongs to the page/container, not each individual card.
+
+- Use the shared `--ro-page-gutter` token: fluid on desktop, comfortable on mobile, and never below a safe 12px gutter on very narrow screens.
+- Align the header content, hero content, section headings, filters, card rails, and footer content to the same container edge wherever their visual layout allows.
+- Use a centered maximum-width container for readable content on wide displays.
+- Avoid adding another layer of horizontal padding to a child when its parent already owns the page gutter.
+
+### Section spacing
+Header, hero, section headings, filters, and supporting copy should flow continuously unless a deliberate visual treatment requires separation.
+
+- Default vertical margin between header, hero, section intro, subtitle, and filter controls is **zero**.
+- Prefer a section's internal top padding for readable content inset rather than margin that creates a visible blank band between adjacent sections.
+- Remove default heading and paragraph margins where they create accidental gaps; add only the small, intentional spacing needed inside a text group.
+- Do not add generic `margin-top` between consecutive page sections.
+- A hero may have internal padding to protect its copy; that padding does not create an outside gap.
+- A background-color transition between sections is not itself a reason to add vertical whitespace.
+
+### Card spacing
+Cards and card collections are the exception: they need deliberate separation.
+
+- Use `--ro-card-gap` / `--card-gap` for consistent gaps between cards in grids, dashboard panels, subscription cards, and horizontal listing rails.
+- Use card padding for content inside the card; use grid/flex gap for distance between sibling cards.
+- Do not create spacing between cards by applying arbitrary margins to each card, because that creates uneven outer edges and doubled gaps.
+- Listing-card internal padding should be consistent across landing, marketplace, saved items, and My Published Items.
+- At narrow widths, reduce collection gaps modestly while preserving touch targets and readable card content.
+
+### Responsive behavior and acceptance checks
+- Desktop: main content is centered, has a bounded width, and uses a fluid gutter; cards have clear, consistent gaps.
+- Mobile/Android: page gutters stay compact but safe; content does not touch the viewport edge; card rails scroll horizontally where appropriate.
+- Header → hero → introductory content → filters should not have accidental blank strips between them.
+- No negative margins or broad global selector overrides should be introduced just to cancel an individual component's spacing.
+- Inspect at 320px, 375px, 430px, tablet, and wide desktop widths before marking the spacing pass complete.

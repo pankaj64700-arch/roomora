@@ -1,0 +1,62 @@
+name: Subscription migration validation
+
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/20261010100000_roomora_subscription_stage1.sql"
+      - "supabase/migrations/20261010120000_phonepe_autopay_lifecycle.sql"
+      - "supabase/tests/**"
+      - ".github/workflows/subscription-migration-validation.yml"
+  workflow_dispatch:
+
+jobs:
+  postgres-migration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: roomora_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d roomora_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check PhonePe Edge Functions
+        run: >-
+          deno check
+          supabase/functions/phonepe-create-order/index.ts
+          supabase/functions/phonepe-verify-order/index.ts
+          supabase/functions/phonepe-webhook/index.ts
+          supabase/functions/phonepe-schedule-renewals/index.ts
+          supabase/functions/phonepe-cancel-subscription/index.ts
+          supabase/functions/phonepe-subscription-status/index.ts
+      - name: Apply disposable RoomOra baseline
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d roomora_test -v ON_ERROR_STOP=1 -f supabase/tests/fixtures/subscription_stage1_baseline.sql
+      - name: Apply Stage 1 migration
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d roomora_test -v ON_ERROR_STOP=1 -f supabase/migrations/20261010100000_roomora_subscription_stage1.sql
+      - name: Apply PhonePe AutoPay lifecycle migration
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d roomora_test -v ON_ERROR_STOP=1 -f supabase/migrations/20261010120000_phonepe_autopay_lifecycle.sql
+      - name: Run Stage 1 schema and idempotency tests
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d roomora_test -v ON_ERROR_STOP=1 -f supabase/tests/subscription_stage1.sql
+      - name: Run PhonePe AutoPay schema tests
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d roomora_test -v ON_ERROR_STOP=1 -f supabase/tests/phonepe_autopay_lifecycle.sql

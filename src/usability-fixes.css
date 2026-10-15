@@ -14,3 +14,106 @@ body{font-size:14px}
 .role-option.active{border-color:var(--ui-accent);background:var(--accent-soft);color:var(--ui-accent)}
 /* Keep secondary copy readable on small screens. */
 @media(max-width:680px){.hero h1{font-size:30px}.hero p{font-size:12px}.hero .eyebrow{font-size:12px}.hero-notes{font-size:12px}.trust-row{font-size:12px}.hero-notes span{white-space:nowrap}.nav a,.nav-login,.nav-cta{font-size:12px}.section h2,.market h2{font-size:24px}.feature-band h2{font-size:20px}}
+
+
+/* RoomOra spacing pass — continuous page sections, contained page gutters, and card-only gaps. */
+:root {
+  --ro-page-gutter: clamp(14px, 3.2vw, 40px);
+  --ro-content-max: 1440px;
+  --ro-card-gap: clamp(12px, 1.5vw, 20px);
+}
+html, body, #root { min-width: 320px; }
+.app, .dashboard-shell { margin: 0; }
+.topbar { margin: 0; }
+.hero { margin: 0; }
+.trust-row {
+  margin: 0 auto;
+  padding: 12px var(--ro-page-gutter);
+}
+.section {
+  margin: 0 auto;
+  padding: 0 var(--ro-page-gutter) clamp(32px, 5vw, 64px);
+}
+.section-head { margin: 0 0 var(--ro-card-gap); }
+.room-grid { gap: var(--ro-card-gap); }
+.workspace-grid { gap: var(--ro-card-gap); }
+.workspace-card { margin: 0; }
+.feature-band { margin: 0 auto clamp(32px, 5vw, 64px); }
+.market { margin: 0 auto; padding: 0 var(--ro-page-gutter) clamp(32px, 5vw, 64px); gap: var(--ro-card-gap); }
+.market-landing {
+  margin: 0;
+  padding: 0 0 clamp(28px, 4vw, 48px);
+}
+.market-landing-head {
+  width: 100%;
+  max-width: var(--ro-content-max);
+  margin: 0 auto;
+  padding: clamp(16px, 2.2vw, 28px) var(--ro-page-gutter) 0;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--ro-card-gap);
+}
+.market-landing-rows {
+  width: 100%;
+  max-width: var(--ro-content-max);
+  margin: 0 auto;
+  padding: 0 var(--ro-page-gutter);
+  gap: var(--ro-card-gap);
+}
+.market-landing .market-filters {
+  width: 100%;
+  max-width: var(--ro-content-max);
+  margin: 0 auto;
+  padding: 0 var(--ro-page-gutter);
+}
+.market-landing-row { margin: 0; }
+.market-horizontal { gap: var(--ro-card-gap); }
+.market-image-card { margin: 0; }
+.dash-top { margin: 0; }
+.dash-content {
+  width: 100%;
+  max-width: calc(var(--ro-content-max) + 2 * var(--ro-page-gutter));
+  margin: 0 auto;
+  padding: 0 var(--ro-page-gutter) clamp(28px, 4vw, 48px);
+}
+.dash-hero { margin: 0; padding: clamp(14px, 2vw, 22px) 0 0; }
+.dash-stats, .dash-grid, .workspace-grid, .subscription-manager { gap: var(--ro-card-gap); }
+.dash-panel, .dash-stat, .workspace-card, .subscription-card { margin: 0; }
+.marketplace-panel { margin: 0; }
+.marketplace-panel > * + * { margin-top: 0; }
+.market-head { margin: 0; padding: clamp(14px, 2vw, 22px) 0 0; }
+.market-landing-head + .landing-filters,
+.market-landing-head + .market-filters { margin-top: 0; }
+.market-landing-rows { padding-top: 0; }
+.market-row-title { margin-top: 0; }
+.market-landing-row + .market-landing-row { margin-top: var(--ro-card-gap); }
+@media (max-width: 800px) {
+  .trust-row { padding: 10px var(--ro-page-gutter); }
+  .section { padding: 0 var(--ro-page-gutter) 32px; }
+  .market-landing-head {
+    padding: 14px var(--ro-page-gutter) 0;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .market-landing-head > button { width: 100%; justify-content: center; }
+  .market-landing-rows { padding: 0 var(--ro-page-gutter); gap: var(--ro-card-gap); }
+  .market-landing .market-filters { padding: 0 var(--ro-page-gutter); }
+  .dash-content { padding: 0 var(--ro-page-gutter) 28px; }
+  .dash-hero { padding-top: 14px; margin-bottom: 0; }
+  .dash-stats, .dash-grid, .workspace-grid, .subscription-manager { gap: 12px; }
+  .marketplace-panel { padding: 0; }
+}
+@media (max-width: 430px) {
+  :root { --ro-page-gutter: 12px; --ro-card-gap: 10px; }
+  .market-landing-head { padding-top: 12px; }
+}
+
+
+/* Zero vertical seams between header/hero/content; gutters remain horizontal. */
+.market-landing-head { padding-top: 0; }
+.market-head { padding-top: 0; }
+.dash-hero { padding-top: 0; }
+.market-landing .market-filters { margin-top: 0; }
+.market-landing-head + .market-filters,
+.market-landing-head + .landing-filters { margin-top: 0; }
