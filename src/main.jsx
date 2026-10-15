@@ -10,6 +10,8 @@ import './auth.css';
 import './mobile-commerce.css';
 import './usability-fixes.css';
 import './glassmorphism.css';
+import StatusPage, { getStatusRoute } from './StatusPage';
+import './roomora-refresh.css';
 
 const roleOptions = [
   { key: 'tenant', label: 'Tenant', note: 'Find rooms and sell used belongings when moving.' },
@@ -36,12 +38,14 @@ function AuthModal({ open, onClose, onSignedIn }) {
 }
 
 function App() {
+  const statusRoute = getStatusRoute(window.location.pathname);
   const [menuOpen, setMenuOpen] = useState(false), [authOpen, setAuthOpen] = useState(false), [sessionUser, setSessionUser] = useState(null), [profile, setProfile] = useState(null);
   const heroRef = useRef(null);
   const loadProfile = async user => { if (!supabase || !user) { setProfile(null); return; } const { data } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(); setProfile(data || null); };
   useEffect(() => { if (!supabase) return; let active = true; supabase.auth.getSession().then(async ({ data }) => { if (!active) return; const user = data.session?.user || null; setSessionUser(user); if (user) await loadProfile(user); }); const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => { const user = session?.user || null; setSessionUser(user); if (user) { try { await initializeProfile(user); } catch {} await loadProfile(user); } else setProfile(null); }); return () => { active = false; listener.subscription.unsubscribe(); }; }, []);
   useEffect(() => { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; if (!heroRef.current) return; animate(heroRef.current.querySelectorAll('[data-animate]'), { opacity: [0, 1], translateY: [18, 0], delay: stagger(90), duration: 650, ease: 'out(3)' }); }, []);
   const openAuth = () => { setMenuOpen(false); setAuthOpen(true); }, signOut = async () => { if (supabase) await supabase.auth.signOut(); setSessionUser(null); setProfile(null); };
+  if (statusRoute) return <StatusPage type={statusRoute}/>;
   if (sessionUser && profile) return <Dashboard user={sessionUser} profile={profile} onSignOut={signOut}/>;
   return <div className="app"><header className="topbar"><a className="brand" href="#top"><span className="brand-mark">R</span><span>Room<span className="brand-accent">Ora</span></span></a><nav className={menuOpen ? 'nav open' : 'nav'}><a href="#marketplace" onClick={() => setMenuOpen(false)}>Marketplace</a><a href="#how" onClick={() => setMenuOpen(false)}>How it works</a>{sessionUser ? <><span className="signed-user"><UserRound size={15}/>{profile?.display_name || sessionUser.email}</span><button className="nav-login" onClick={signOut}><LogOut size={15}/> Sign out</button></> : <><button className="nav-login" onClick={openAuth}>Sign in</button><button className="nav-cta" onClick={openAuth}>Get started</button></>}</nav><button className="menu-btn" aria-label="Toggle menu" onClick={() => setMenuOpen(v => !v)}>{menuOpen ? <X/> : <Menu/>}</button></header>
     <main id="top"><section className="hero" ref={heroRef}><div className="hero-art" aria-hidden="true" data-animate><div className="art-card art-main"><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=85" alt=""/></div><div className="hero-art-shade"/></div><div className="hero-copy"><div className="eyebrow" data-animate><ShieldCheck size={15}/> Simple, local &amp; human</div><h1 data-animate>Find a room that<br/><em>feels like home.</em></h1><p data-animate>Find rooms, furniture, stationery and useful second-hand items in one place. Listing details stay private until you sign in.</p><button className="search-btn" data-animate onClick={() => document.getElementById('marketplace')?.scrollIntoView({ behavior: 'smooth' })}><ArrowRight size={18}/> Browse marketplace</button><div className="hero-notes" data-animate><span>✓ Image-first browsing</span><span>✓ Four clear categories</span><span>✓ Details after sign-in</span></div></div></section>
