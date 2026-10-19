@@ -1,0 +1,22 @@
+{
+  "id": "/",
+  "name": "RoomOra — Rooms & Student Marketplace",
+  "short_name": "RoomOra",
+  "description": "Find rooms, furniture, stationery and second-hand student essentials near you.",
+  "lang": "en-IN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f6f1",
+  "theme_color": "#f7f6f1",
+  "categories": ["lifestyle", "shopping"],
+  "icons": [
+    {
+      "src": "/roomora-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
