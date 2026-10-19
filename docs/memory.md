@@ -76,3 +76,9 @@
 - Do not store secrets or actual customer data in repository docs.
 - Record what was tested and what remains unverified.
 - Do not call the product secure, complete or deployed without evidence.
+
+
+## UI decision — 2026-10-19
+- The user prefers the marketplace card flow to return to vertical page scrolling because it feels easier and clearer.
+- Category sections remain stacked vertically; cards within each section use a responsive grid (4 desktop / 3 tablet / 2 mobile) instead of horizontal scrolling rails.
+- Reuse the shared `MarketplaceCard` and its compact visual treatment; avoid unrelated layout or data-flow changes in this pass.
