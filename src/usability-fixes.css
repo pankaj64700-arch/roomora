@@ -117,3 +117,51 @@ html, body, #root { min-width: 320px; }
 .market-landing .market-filters { margin-top: 0; }
 .market-landing-head + .market-filters,
 .market-landing-head + .landing-filters { margin-top: 0; }
+
+
+/* FINAL marketplace rail override — use page-level vertical scrolling, never sideways card rails. */
+.market-landing .market-landing-rows .market-horizontal,
+.marketplace-panel .market-horizontal,
+.market-horizontal {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  align-items: stretch;
+  gap: var(--ro-card-gap, 12px) !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  scroll-snap-type: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  scrollbar-width: auto;
+  padding: 2px 2px 4px !important;
+}
+.market-horizontal::-webkit-scrollbar { display: initial !important; }
+.market-horizontal > .market-image-card,
+.market-horizontal > article,
+.market-horizontal .market-image-card {
+  flex: initial !important;
+  width: 100% !important;
+  max-width: 100%;
+  min-width: 0 !important;
+  scroll-snap-align: none !important;
+}
+@media (max-width: 900px) {
+  .market-landing .market-landing-rows .market-horizontal,
+  .marketplace-panel .market-horizontal,
+  .market-horizontal {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 600px) {
+  .market-landing .market-landing-rows .market-horizontal,
+  .marketplace-panel .market-horizontal,
+  .market-horizontal {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .market-horizontal .market-image-card-media { height: clamp(100px, 30vw, 140px) !important; }
+}
