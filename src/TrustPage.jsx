@@ -1,5 +1,4 @@
 import React from 'react';
-import { Mail, MapPin, Code2, ExternalLink } from 'lucide-react';
 import { ArrowLeft, ShieldCheck, FileText, UserRound, Code2, Building2, LockKeyhole } from 'lucide-react';
 import './trust-pages.css';
 
