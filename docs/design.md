@@ -89,26 +89,19 @@ Do not make cards, fonts, or spacing universally smaller just to fit more conten
 
 A compact marketplace card should still preserve enough image area, readable title/price, and comfortable actions. Visual density and interaction target size are separate concerns.
 
-## 7. Horizontal-first discovery
-For marketplace/discovery content, prefer **horizontal scrolling over stacking long rows vertically** when content is naturally a collection of cards.
-
-Use horizontal rails for:
-- marketplace category listings
-- recommended items
-- recently added items
-- saved/recent collections
-- compact feature collections
+## 7. Vertical-first discovery
+For marketplace and discovery pages, prefer a **normal vertical page scroll** with category sections stacked down the page and listing cards arranged in responsive grids.
 
 Rules:
-- Each rail should clearly suggest that more content is available horizontally.
-- Use touch-friendly `overflow-x: auto` scrolling.
-- Hide/minimize scrollbars without removing discoverability.
-- Keep cards large enough to understand at a glance.
-- Scroll snapping may be used when it improves control.
-- Do not use horizontal scrolling for content requiring side-by-side comparison or long-form reading.
-- Avoid nested horizontal scroll containers where possible.
+- Category sections flow vertically in a predictable reading order.
+- Listing cards wrap into a responsive grid: typically two columns on phones, three on tablets, and four on desktop, adapting to available width.
+- Keep cards compact but readable, with enough image area and clear title/price hierarchy.
+- Avoid horizontal scrolling for listing-card collections; users should be able to browse the feed with the familiar page scroll.
+- Horizontal scrolling may still be used for compact controls such as category filters when it prevents excessive wrapping.
+- Avoid nested scroll containers and constrain page-level overflow.
+- Show only meaningful categories/results in discovery layouts and omit empty category sections.
 
-Vertical scrolling remains appropriate for full pages, forms, detailed listing information, and long reading content. The goal is to reduce unnecessary vertical browsing, not eliminate vertical scrolling entirely.
+The goal is an easy, continuous browse experience with comfortable density and predictable touch behavior.
 
 ## 8. Android/mobile UX baseline
 RoomOra must feel natural on common Android phones and mobile browsers.
