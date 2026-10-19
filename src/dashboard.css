@@ -70,3 +70,5 @@
  .chat-back-mobile{display:grid;place-items:center}
  .chat-bubble{max-width:82%}
 }
+
+.dash-policy-links{display:flex;flex-direction:column;gap:3px;padding:14px 10px 10px;margin-top:auto;border-top:1px solid var(--ro-line,#dfe3dc)}.dash-policy-links>span{font-size:9px;letter-spacing:.13em;font-weight:800;color:var(--ro-muted,#7b847d);padding:0 9px 5px}.dash-policy-links button{border:0;background:transparent;text-align:left;color:var(--ro-muted,#667068);font-size:11px;padding:7px 9px;border-radius:8px}.dash-policy-links button:hover{background:var(--ro-surface,#f0f3ef);color:var(--ro-primary,#2f7d54)}@media(max-width:680px){.dash-policy-links{padding:10px 4px}.dash-policy-links button{padding:8px 9px;font-size:12px}}
