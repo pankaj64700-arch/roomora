@@ -104,3 +104,10 @@ Use compact, readable cards, modest gaps, comfortable touch targets, horizontal 
 
 ## Task discipline
 Complete tasks in focused batches. Do not start unrelated workstreams without recording them here. Check boxes only after tests/evidence confirm completion.
+
+
+## UI revision — vertical marketplace card flow (2026-10-19)
+- [x] Replace horizontal listing rails with a responsive card grid in the shared marketplace stylesheet.
+- [x] Keep category sections stacked vertically and retain shared compact card styling.
+- [ ] Verify public landing and signed-in marketplace at mobile, tablet and desktop widths; confirm no horizontal page overflow.
+- [ ] Confirm Vercel preview/build after the change is merged or deployed.

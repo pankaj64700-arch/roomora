@@ -321,7 +321,14 @@ Cards and card collections are the exception: they need deliberate separation.
 
 ### Responsive behavior and acceptance checks
 - Desktop: main content is centered, has a bounded width, and uses a fluid gutter; cards have clear, consistent gaps.
-- Mobile/Android: page gutters stay compact but safe; content does not touch the viewport edge; card rails scroll horizontally where appropriate.
+- Mobile/Android: page gutters stay compact but safe; content does not touch the viewport edge; marketplace categories stack vertically and cards use a responsive grid so the page scrolls vertically.
 - Header → hero → introductory content → filters should not have accidental blank strips between them.
 - No negative margins or broad global selector overrides should be introduced just to cancel an individual component's spacing.
 - Inspect at 320px, 375px, 430px, tablet, and wide desktop widths before marking the spacing pass complete.
+
+
+### Marketplace card flow update (2026-10-19)
+- Use normal vertical page scrolling for marketplace cards instead of horizontal card rails.
+- Keep category sections stacked vertically; cards within each category use a responsive grid.
+- Target four columns on wide desktop, three on tablet/intermediate widths, and two on mobile/Android.
+- Preserve compact shared `MarketplaceCard` styling and consistent grid gaps across public discovery and signed-in marketplace views.
