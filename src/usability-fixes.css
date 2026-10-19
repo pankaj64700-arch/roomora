@@ -165,3 +165,19 @@ html, body, #root { min-width: 320px; }
   }
   .market-horizontal .market-image-card-media { height: clamp(100px, 30vw, 140px) !important; }
 }
+
+
+/* Hero-art height +10% across desktop and mobile; the artwork fills .hero. */
+.hero {
+  height: 22vh !important; /* 20vh baseline +10% */
+}
+.hero-art {
+  height: 100% !important;
+}
+@media (max-width: 680px) {
+  .hero {
+    height: 36.3svh !important; /* 33svh baseline +10% */
+    min-height: 253px !important; /* 230px baseline +10% */
+    max-height: 363px !important; /* 330px baseline +10% */
+  }
+}
