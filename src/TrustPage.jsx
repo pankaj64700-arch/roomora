@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ShieldCheck, FileText, UserRound, Code2, Building2, LockKeyhole } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, FileText, UserRound, Code2, Building2, LockKeyhole, Mail, MapPin } from 'lucide-react';
 import './trust-pages.css';
 
 const UPDATED = '19 October 2026';
@@ -94,24 +94,27 @@ const sections = {
   },
   owner: {
     eyebrow: 'ACCOUNTABILITY',
-    title: 'Owner & platform responsibility',
-    intro: 'A trustworthy marketplace should make it clear who operates it and what the operator is responsible for.',
+    eyebrow: 'FOUNDER & ACCOUNTABILITY',
+    title: 'Owner & Founder',
+    intro: 'Er. Pankaj Yadav is the owner and full-stack developer behind RoomOra, based in Prayagraj, Uttar Pradesh, India.',
     content: [
-      ['Who operates RoomOra?', 'RoomOra is the project represented by this application. The legal owner/operator’s verified name and official business or correspondence details have not been supplied in the project information available for this update, so they are intentionally not invented here. Those details should be published before the marketplace is opened to the public.'],
-      ['What the owner is responsible for', 'Maintaining the service and its published policies; providing a monitored contact channel; reviewing reports in a reasonable way; handling account and security issues; and meeting legal obligations applicable to the actual operating model. The precise obligations depend on the owner’s legal status, the services enabled, and the laws that apply.'],
-      ['How to contact the owner', 'Before launch, replace the configuration placeholders in this page with the legal owner/operator name, a monitored support email, and any business or grievance contact required by law. Do not rely on an unmonitored or invented contact address.'],
-      ['Marketplace boundaries', 'RoomOra helps users find and publish listings. Unless a particular service expressly states otherwise, the platform does not independently certify each user, guarantee a listing, or become a party to a rental or product sale. This does not remove any duty or liability that applicable law places on the operator.']
+      ['Meet the founder', 'Pankaj is building RoomOra to bring room and PG discovery together with furniture, stationery, and second-hand student essentials in one accessible marketplace.'],
+      ['Company contact', 'For company, platform, or support enquiries, email roomora1910@gmail.com.'],
+      ['Founder contact', 'For personal or professional enquiries, email pankaj64700@gmail.com.'],
+      ['Marketplace responsibility', 'RoomOra aims to make listing information and platform rules clearer. Listings are user-submitted and should be independently verified. The platform does not certify every user, room, property, or product, and this statement does not limit any responsibility required by applicable law.']
     ]
   },
   developer: {
     eyebrow: 'HOW IT IS BUILT',
-    title: 'Developer & product approach',
-    intro: 'RoomOra is being developed as a mobile-friendly marketplace with a focus on straightforward browsing, clear listings, and practical account tools.',
+    eyebrow: 'FOUNDER · OWNER · BUILDER',
+    title: 'Meet the Developer',
+    intro: 'Er. Pankaj Yadav — Full-Stack Developer and the founder and owner of RoomOra.',
     content: [
-      ['Product and engineering', 'The application uses a React-based frontend and connected backend services for account and marketplace functionality. The developer work focuses on user experience, reusable interface components, responsive layouts, and reliable listing flows.'],
-      ['What the developer does not certify', 'The presence of a developer page does not mean that every user, property, seller, product, or listing has been independently verified. Technical checks can improve service reliability, but they cannot replace real-world due diligence.'],
-      ['Developer identity', 'The developer’s verified public name, professional profile, and contact details were not provided for this update, so no identity or credentials are fabricated. Add only details the developer has approved for public display.'],
-      ['Report an issue', 'Users should report technical problems, suspected security issues, or misleading listings through the verified RoomOra support channel once it is configured. Avoid sending passwords, OTPs, payment credentials, or other secrets in a report.']
+      ['Building RoomOra', 'Pankaj is developing RoomOra as a mobile-friendly marketplace for students and local communities, bringing room and PG discovery together with furniture, stationery, and second-hand items.'],
+      ['Product approach', 'The goal is to make browsing, saving, and managing listings simple while being transparent about what the platform can and cannot verify. RoomOra is an ongoing project and features may evolve.'],
+      ['Company email', 'roomora1910@gmail.com'],
+      ['Personal email', 'pankaj64700@gmail.com'],
+      ['Based in', 'Prayagraj, Uttar Pradesh, India']
     ]
   }
 };
