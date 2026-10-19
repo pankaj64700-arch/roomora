@@ -167,23 +167,17 @@ html, body, #root { min-width: 320px; }
 }
 
 
-/* Increase the landing hero-art section height by exactly 10% on every viewport.
-   The original hero height is 20vh, so 22vh preserves the same responsive sizing. */
+/* Increase the current hero-art section height by another 10% on every viewport. */
 .hero {
-  height: 22vh !important;
+  height: 24.2vh !important; /* 22vh +10% */
 }
 .hero-art {
   height: 100% !important;
 }
-@media (max-width: 900px) {
-  .hero {
-    height: 22vh !important;
-  }
-}
 @media (max-width: 680px) {
   .hero {
-    height: 22vh !important;
-    min-height: 0 !important;
-    max-height: none !important;
+    height: 39.93svh !important; /* 36.3svh +10% */
+    min-height: 278px !important; /* 253px +10%, rounded */
+    max-height: 399px !important; /* 363px +10%, rounded */
   }
 }
