@@ -1,4 +1,5 @@
 import React from 'react';
+import { Mail, MapPin, Code2, ExternalLink } from 'lucide-react';
 import { ArrowLeft, ShieldCheck, FileText, UserRound, Code2, Building2, LockKeyhole } from 'lucide-react';
 import './trust-pages.css';
 
@@ -58,6 +59,41 @@ const sections = {
     ]
   },
   owner: {
+    eyebrow: 'FOUNDER & ACCOUNTABILITY',
+    title: 'Owner & Founder',
+    intro: 'RoomOra is founded and developed by Er. Pankaj Yadav, a full-stack developer based in Prayagraj, Uttar Pradesh, India.',
+    content: [
+      ['Meet the founder', 'Er. Pankaj Yadav is the owner and full-stack developer behind RoomOra. He is building the platform to bring room and PG discovery together with furniture, stationery, and second-hand student essentials in one accessible marketplace.'],
+      ['Location', 'Prayagraj, Uttar Pradesh, India'],
+      ['Contact RoomOra', 'For company, platform, or support enquiries, email roomora1910@gmail.com.'],
+      ['Contact the founder', 'For personal or professional enquiries, email pankaj64700@gmail.com.'],
+      ['Marketplace responsibility', 'RoomOra aims to make listing information and platform rules clearer. Listings are user-submitted and should be independently verified. The platform does not certify every user, room, property, or product, and this statement does not limit any responsibility required by applicable law.']
+    ]
+  },
+  developer: {
+    eyebrow: 'FOUNDER · OWNER · BUILDER',
+    title: 'Meet the Developer',
+    intro: 'Er. Pankaj Yadav — Full-Stack Developer and the founder and owner of RoomOra.',
+    content: [
+      ['Building RoomOra', 'Pankaj is developing RoomOra as a mobile-friendly marketplace for students and local communities. The product brings room and PG discovery together with furniture, stationery, and second-hand items, with an emphasis on approachable design and practical listing tools.'],
+      ['Product approach', 'The goal is to make it easier to browse, compare, save, and manage listings while being transparent about what the platform can and cannot verify. RoomOra is an ongoing project and its features may continue to evolve.'],
+      ['Company contact', 'Email: roomora1910@gmail.com'],
+      ['Founder contact', 'Email: pankaj64700@gmail.com'],
+      ['Based in', 'Prayagraj, Uttar Pradesh, India']
+    ]
+  },
+  about: {
+    eyebrow: 'A MORE HUMAN MARKETPLACE',
+    title: 'About RoomOra',
+    intro: 'RoomOra brings room and PG discovery together with useful student essentials—furniture, stationery, and second-hand items—in one simple marketplace.',
+    content: [
+      ['What we are building', 'A visual, location-aware place to discover listings, compare the details that matter, and help students and local communities make more informed choices. The experience is designed to be approachable on mobile devices as well as desktop.'],
+      ['How RoomOra works', 'People can browse available listings, choose a category, and use account features to save items or manage their own listings. Listings are created by users, so details should always be verified directly with the person offering the room or product.'],
+      ['Trust is a shared responsibility', 'We aim to make the rules visible, encourage accurate listings, and provide a way to raise concerns. A profile or listing on RoomOra is not, by itself, proof of identity, property ownership, product quality, or trustworthiness. Please use sensible safety practices before meeting someone or paying money.'],
+      ['Our commitment', 'We want RoomOra to be clear about what it offers, what it cannot guarantee, and how users can raise concerns. We will continue to improve usability, transparency, and reporting as the platform develops.']
+    ]
+  },
+  owner: {
     eyebrow: 'ACCOUNTABILITY',
     title: 'Owner & platform responsibility',
     intro: 'A trustworthy marketplace should make it clear who operates it and what the operator is responsible for.',
@@ -88,7 +124,7 @@ export default function TrustPage({ page, onClose }) {
   return <div className="trust-page-backdrop" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}>
     <article className="trust-page" role="dialog" aria-modal="true" aria-labelledby="trust-page-title">
       <header className="trust-page-top"><button className="trust-back" onClick={onClose}><ArrowLeft size={17}/> Back to RoomOra</button><span className="trust-page-version"><ShieldCheck size={14}/> Updated {UPDATED}</span></header>
-      <div className="trust-page-hero"><div className="trust-page-icon"><Icon size={22}/></div><div className="trust-page-eyebrow">{data.eyebrow}</div><h1 id="trust-page-title">{data.title}</h1><p>{data.intro}</p>{page === 'terms' && <span className="trust-version-tag">Terms version {VERSION}</span>}</div>
+      <div className={page === 'owner' || page === 'developer' ? 'trust-page-hero trust-profile-hero' : 'trust-page-hero'}>{(page === 'owner' || page === 'developer') && <img className="trust-founder-photo" src="/pankaj-yadav.jpg" alt="Er. Pankaj Yadav, RoomOra founder and full-stack developer" loading="lazy"/>}<div className="trust-profile-copy"><div className="trust-page-icon"><Icon size={22}/></div><div className="trust-page-eyebrow">{data.eyebrow}</div><h1 id="trust-page-title">{data.title}</h1><p>{data.intro}</p>{(page === 'owner' || page === 'developer') && <div className="trust-contact-links"><a href="mailto:roomora1910@gmail.com"><Mail size={15}/> Company email</a><a href="mailto:pankaj64700@gmail.com"><Mail size={15}/> Personal email</a><span><MapPin size={15}/> Prayagraj, Uttar Pradesh, India</span></div>}{page === 'terms' && <span className="trust-version-tag">Terms version {VERSION}</span>}</div></div>
       <div className="trust-page-content">{data.content.map(([heading, body]) => <section className="trust-policy-section" key={heading}><h2>{heading}</h2><p>{body}</p></section>)}
       {page === 'terms' && <p className="trust-legal-note"><strong>Important:</strong> This is a practical draft, not legal advice. It cannot guarantee protection from legal claims. Have a qualified lawyer review it against RoomOra’s real business model, data flows, and applicable law before launch.</p>}
       {page === 'owner' && <div className="trust-setup-note"><strong>Owner setup required before public launch</strong><p>Publish the verified legal owner/operator name and monitored support contact. Do not leave identity or grievance-contact information unconfigured.</p></div>}
