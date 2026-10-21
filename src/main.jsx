@@ -59,7 +59,7 @@ function RoomoraStatusPage({kind='404'}) {
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false), [authOpen, setAuthOpen] = useState(false), [sessionUser, setSessionUser] = useState(null), [profile, setProfile] = useState(null), [trustPage, setTrustPage] = useState(null), [installPrompt, setInstallPrompt] = useState(null), [installHelpOpen, setInstallHelpOpen] = useState(false), [isInstalled, setIsInstalled] = useState(() => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
-  const heroRef = useRef(null); const routePath = window.location.pathname.replace(/\\/+$/, '') || '/';
+  const heroRef = useRef(null); const routePath = window.location.pathname.replace(/\/+$/, '') || '/';
   const loadProfile = async user => { if (!supabase || !user) { setProfile(null); return; } const { data } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(); setProfile(data || null); };
   useEffect(() => { if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(error => console.error('RoomOra service worker registration failed:', error)); }, []);
   useEffect(() => { const onBeforeInstall = event => { event.preventDefault(); setInstallPrompt(event); }; const onInstalled = () => { setIsInstalled(true); setInstallPrompt(null); setInstallHelpOpen(false); }; window.addEventListener('beforeinstallprompt', onBeforeInstall); window.addEventListener('appinstalled', onInstalled); return () => { window.removeEventListener('beforeinstallprompt', onBeforeInstall); window.removeEventListener('appinstalled', onInstalled); }; }, []);
