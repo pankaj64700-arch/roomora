@@ -1,0 +1,31 @@
+.roomora-state{--state-accent:#176960;--state-pale:#e8f5ef;--state-border:#d4e5df;isolation:isolate;min-height:100svh;display:flex;flex-direction:column;background:radial-gradient(circle at 10% 8%,#e7f8ef,transparent 42%),linear-gradient(135deg,#f8fbf9,#f0f8f5 70%,#faf8f3);color:#17312e;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.roomora-state *{box-sizing:border-box}
+.roomora-state--error{--state-accent:#ac4342;--state-pale:#ffefec;--state-border:#f4d8d3}
+.roomora-state--pending{--state-accent:#8a6314;--state-pale:#fff6e0;--state-border:#eddfa9}
+.roomora-state--neutral{--state-accent:#416a7d;--state-pale:#eaf2f7;--state-border:#d2e1e9}
+.roomora-state__header{width:min(1180px,calc(100% - 3rem));margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.7rem 0}
+.roomora-state__brand{display:inline-flex;align-items:center;gap:.7rem;font-size:1.25rem;font-weight:800;letter-spacing:-.05em;color:inherit;text-decoration:none}
+.roomora-state__brand strong{color:var(--state-accent)}
+.roomora-state__brand-icon{display:grid;place-items:center;width:2.15rem;height:2.15rem;border-radius:.65rem;color:white;background:#183c38;font-size:1rem;letter-spacing:0}
+.roomora-state__topline{display:inline-flex;align-items:center;gap:.45rem;color:#55766c;font-weight:650;font-size:.8rem}
+.roomora-state__content{flex:1;display:grid;place-content:center;justify-items:center;padding:2.5rem 1.3rem 3rem}
+.roomora-state__card{width:min(600px,100%);padding:clamp(1.5rem,5vw,3.7rem);text-align:center;background:rgba(255,255,255,.97);border:1px solid #d9e7e1;border-radius:28px;box-shadow:0 27px 85px rgba(23,68,55,.11)}
+.roomora-state__symbol{width:74px;height:74px;margin:0 auto 1.6rem;display:grid;place-items:center;color:var(--state-accent);border:1px solid var(--state-border);border-radius:22px;background:var(--state-pale)}
+.roomora-state__eyebrow{margin:0 0 .8rem;letter-spacing:.14em;font-weight:800;font-size:.73rem;color:var(--state-accent)}
+.roomora-state h1{font-weight:820;font-size:clamp(2rem,5vw,3.25rem);letter-spacing:-.058em;line-height:1.15;margin:0}
+.roomora-state__description{margin:1.15rem auto 0;max-width:47ch;color:#5e716f;line-height:1.75;font-size:1rem}
+.roomora-state__actions{display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center;margin:2rem 0}
+.roomora-state__actions a{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.15rem;min-height:48px;border-radius:13px;font-size:.89rem;font-weight:700;text-decoration:none;transition:transform .18s ease}
+.roomora-state__actions a:hover{transform:translateY(-2px)}
+.roomora-state__primary{background:var(--state-accent);color:white;box-shadow:0 10px 21px rgba(28,100,83,.16)}
+.roomora-state__secondary{background:white;color:#21413c;border:1px solid #dce8e2}
+.roomora-state__note{display:flex;align-items:flex-start;gap:.7rem;text-align:left;padding:1rem;border:1px solid var(--state-border);border-radius:13px;background:var(--state-pale);color:#425d56}
+.roomora-state__note svg{flex-shrink:0;color:var(--state-accent)}
+.roomora-state__note p{margin:0;font-size:.85rem;line-height:1.6}
+.roomora-state__tagline{margin:1.8rem 0 0;color:#6b827a;text-align:center;font-size:.85rem}
+.roomora-state__footer{text-align:center;padding:0 1rem 1.5rem;color:#758a83;font-size:.78rem}
+.roomora-state__skip{position:absolute;top:-100px;left:1rem;background:#173c36;color:white;padding:.65rem 1rem;z-index:10}
+.roomora-state__skip:focus{top:1rem}
+.roomora-state a:focus-visible{outline:3px solid #4a9bb7;outline-offset:3px}
+@media(max-width:580px){.roomora-state__header{width:calc(100% - 2rem);padding:1.1rem 0}.roomora-state__topline{font-size:.68rem}.roomora-state__content{padding:1.7rem 1rem 2rem}.roomora-state__card{padding:2rem 1.25rem;border-radius:21px}.roomora-state__actions{flex-direction:column}.roomora-state__actions a{width:100%}.roomora-state__description{font-size:.96rem}}
+@media(prefers-reduced-motion:reduce){.roomora-state__actions a{transition:none}.roomora-state__actions a:hover{transform:none}}
