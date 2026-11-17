@@ -1,0 +1,138 @@
+/* One vertical-flow card grid for RoomOra public, dashboard, saved and owner listings. */
+.market-card-grid,.marketplace-owner-grid,.saved-marketplace-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-flow:row!important;align-items:stretch;
+  gap:clamp(12px,1.5vw,20px)!important;
+  width:100%;min-width:0;max-width:100%;
+  overflow:visible!important;scroll-snap-type:none!important;padding:0!important;
+}
+.market-card-grid>.market-image-card{
+  flex:none!important;width:100%!important;min-width:0!important;
+  min-height:100%;scroll-snap-align:none!important;
+  display:flex;flex-direction:column;
+}
+.market-card-grid .market-card-open{
+  display:flex;flex:1 1 auto;flex-direction:column;align-items:stretch;
+  width:100%;min-width:0;
+}
+.market-card-grid .market-card-static{cursor:default}
+.market-card-grid .market-image-card-media{
+  height:auto!important;aspect-ratio:4/3;overflow:hidden;position:relative;
+}
+.market-card-grid .market-image-card-media img{
+  width:100%;height:100%;display:block;object-fit:cover;
+}
+.market-card-grid .market-card-category{
+  top:9px;left:9px;max-width:calc(100% - 18px);padding:5px 8px;
+  white-space:normal;overflow-wrap:anywhere;line-height:1.25;font-size:10px;
+}
+.market-card-grid .market-image-card-info{
+  display:flex;flex:1 1 auto;flex-direction:column;align-items:stretch;
+  gap:7px;min-width:0;min-height:0;padding:13px 14px 15px;
+}
+.market-card-grid .market-image-card-info .market-card-title{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  white-space:normal;overflow:hidden;text-overflow:clip;overflow-wrap:anywhere;
+  font-size:clamp(13px,1.1vw,16px);line-height:1.35;min-height:2.7em;
+  font-weight:800;
+}
+.market-card-grid .market-image-card-info .market-card-price{
+  display:block;font-size:clamp(14px,1.15vw,17px);line-height:1.35;
+  font-weight:800;color:var(--accent,#2f7d54);overflow-wrap:anywhere;
+}
+.market-card-grid .market-image-card-info .market-card-location{
+  display:flex;gap:5px;align-items:flex-start;min-width:0;
+  color:var(--muted,#667068);font-size:12px;font-weight:500;line-height:1.45;
+}
+.market-card-grid .market-card-location>svg{
+  flex:0 0 auto;margin-top:2px;color:var(--accent,#2f7d54);
+}
+.market-card-grid .market-card-location>span{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  min-width:0;white-space:normal;overflow:hidden;overflow-wrap:anywhere;
+  color:inherit;font-size:inherit;font-weight:inherit;
+}
+.market-card-grid .market-card-description{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  overflow:hidden;overflow-wrap:anywhere;min-height:3em;
+  font-size:12px;line-height:1.5;color:var(--muted,#667068);margin:3px 0 0;
+}
+.market-card-grid .market-card-actions{
+  display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:stretch;
+  gap:7px;padding:10px 12px 12px;margin:auto 0 0;
+  border-top:1px solid var(--line,#dfe3dc);
+}
+.market-card-grid .market-card-actions .market-save{
+  display:inline-flex;flex:1 1 auto;align-items:center;justify-content:center;
+  width:auto;min-width:0;min-height:38px!important;
+  padding:8px 10px!important;font-size:12px!important;
+  line-height:1.25;text-align:center;border-radius:9px!important;
+}
+.market-card-grid .market-card-actions .market-save svg{flex-shrink:0}
+.market-card-grid .market-card-actions .market-save.danger{color:#a23633}
+@media(max-width:1023px){
+  .market-card-grid,.marketplace-owner-grid,.saved-marketplace-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media(max-width:700px){
+  .market-card-grid,.marketplace-owner-grid,.saved-marketplace-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .market-card-grid .market-image-card-media{aspect-ratio:1.12/1;height:auto!important}
+  .market-card-grid .market-card-category{
+    top:7px;left:7px;max-width:calc(100% - 14px);
+    padding:4px 6px;font-size:9px;
+  }
+  .market-card-grid .market-image-card-info{
+    padding:10px 10px 12px;gap:6px;
+  }
+  .market-card-grid .market-image-card-info .market-card-title{
+    font-size:12.5px;line-height:1.38;min-height:2.76em;
+  }
+  .market-card-grid .market-image-card-info .market-card-price{font-size:14px}
+  .market-card-grid .market-image-card-info .market-card-location{
+    font-size:11px;gap:3px;
+  }
+  .market-card-grid .market-card-location>svg{width:12px;height:12px}
+  .market-card-grid .market-card-description{
+    font-size:11px;line-height:1.45;min-height:2.9em;
+  }
+  .market-card-grid .market-card-actions{
+    display:flex;flex-wrap:wrap;gap:6px;padding:8px;
+  }
+  .market-card-grid .market-card-actions .market-save{
+    min-height:36px!important;font-size:11px!important;
+    padding:7px 6px!important;
+  }
+  .market-landing-rows,.marketplace-panel .market-landing-rows{gap:20px}
+  .market-row-title{margin-bottom:10px}
+  .market-row-count{font-size:11px}
+}
+/* Full listing dialog retains natural vertical scrolling and readable details. */
+.marketplace-detail-modal{
+  width:min(660px,calc(100vw - 28px));padding:clamp(18px,3vw,28px);
+}
+.marketplace-detail-modal>h2{
+  font-size:clamp(21px,3vw,28px);line-height:1.25;
+  overflow-wrap:anywhere;margin:12px 0;
+}
+.marketplace-detail-modal>p{
+  line-height:1.65;overflow-wrap:anywhere;white-space:pre-line;margin:10px 0;
+}
+.marketplace-detail-modal .market-modal-price{font-size:24px;margin:14px 0}
+.marketplace-detail-modal .publisher-box{padding:14px;gap:12px;margin:16px 0}
+.marketplace-detail-modal .publisher-box span{
+  overflow-wrap:anywhere;line-height:1.5;
+}
+.marketplace-detail-modal .dash-action-row{
+  gap:10px;flex-wrap:wrap;margin-top:15px;
+}
+@media(min-width:801px){
+  .marketplace-detail-modal{max-height:90dvh;overflow-y:auto}
+}
+@media(max-width:800px){
+  .marketplace-detail-modal{max-height:none;overflow:visible}
+}

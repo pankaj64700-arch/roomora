@@ -11,6 +11,7 @@ import './auth.css';
 import './mobile-commerce.css';
 import './usability-fixes.css';
 import './glassmorphism.css';
+import './marketplace-layout.css';
 
 const roleOptions = [
   { key: 'tenant', label: 'Tenant', note: 'Find rooms and sell used belongings when moving.' },
