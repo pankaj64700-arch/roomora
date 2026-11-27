@@ -143,3 +143,8 @@
   display: grid;
   gap: .75rem;
 }
+
+.finance-workspace .finance-secondary {
+  background: #fff;
+  color: #1e4840;
+}
