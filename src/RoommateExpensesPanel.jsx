@@ -35,6 +35,7 @@ export default function RoommateExpensesPanel({ user }) {
   const [notice, setNotice] = useState('');
   const [receipt, setReceipt] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
   const pendingExpense = useRef(null);
 
   function clearInvite() {
@@ -75,6 +76,7 @@ export default function RoommateExpensesPanel({ user }) {
     pendingExpense.current = null;
     setReceipt(null);
     setShowHistory(false);
+    setShowExpenseForm(false);
   }, [roomId, details?.month]);
 
   useEffect(() => {
@@ -156,6 +158,7 @@ export default function RoommateExpensesPanel({ user }) {
       });
       pendingExpense.current = null;
       form.reset();
+      setShowExpenseForm(false);
       await loadRooms(roomId);
       setNotice('Expense sent to your roommates for approval.');
     });
@@ -190,12 +193,22 @@ export default function RoommateExpensesPanel({ user }) {
     });
   }
 
+  function endMonth() {
+    if (!window.confirm(`End the ${formatMonth(details.month)} ledger for everyone? New entries and approvals will stop, and pending expenses will stay outside the final balances. The next ledger opens on the 1st.`)) return;
+    run(async () => {
+      await rpc('finance_close_month', { p_room: roomId, p_month: details.month });
+      setShowExpenseForm(false);
+      await loadRooms(roomId, details.month);
+      setNotice('Month ended. The PDF statement is ready.');
+    });
+  }
+
   const names = new Map(details?.members.map(member => [member.id, member.id === user.id ? `${member.name} (you)` : member.name]));
-  const archived = details && details.month !== details.current_month;
+  const closed = details && (details.closed || details.month !== details.current_month);
   const activeMembers = details?.members.filter(member => member.active !== false) ?? [];
   const visibleExpenses = details?.expenses.filter(expense =>
-    showHistory ? (archived || expenseStatus(expense) !== 'Pending')
-      : (!archived && expenseStatus(expense) === 'Pending')
+    showHistory ? (closed || expenseStatus(expense) !== 'Pending')
+      : (!closed && expenseStatus(expense) === 'Pending')
   ) ?? [];
   const summary = details && summarizeExpenses(details.members, details.expenses);
   const inviteUrl = details?.invite_token && new URL(`/?view=expenses#roommate-invite=${details.invite_token}`, window.location.origin).href;
@@ -268,37 +281,53 @@ export default function RoommateExpensesPanel({ user }) {
       </section>
 
       <section className="dash-panel finance-panel">
-        <h2>Monthly ledger</h2>
+        <div className="finance-actions finance-heading">
+          <h2>Monthly ledger</h2>
+          {inviteUrl && !closed && <button type="button" className="finance-danger" disabled={busy} onClick={endMonth}>End month</button>}
+        </div>
         <label>Expense month
           <select disabled={busy} value={details.month} onChange={event => {
             const month = event.target.value;
             run(() => loadRooms(roomId, month));
           }}>
-            <option value={details.current_month}>{formatMonth(details.current_month)} (current)</option>
+            <option value={details.current_month}>{formatMonth(details.current_month)} ({details.month === details.current_month && closed ? 'closed' : 'current month'})</option>
             {details.previous_month && <option value={details.previous_month}>{formatMonth(details.previous_month)} (closed)</option>}
           </select>
         </label>
-        {archived && <>
+        {closed && <>
           <div className="finance-actions"><button type="button" disabled={busy} onClick={() => run(async () => {
             const requested = details.month;
             const latest = await loadRooms(roomId, requested);
-            if (latest?.month !== requested) throw new Error('This statement is no longer available.');
+            if (latest?.month !== requested || (!latest.closed && latest.month === latest.current_month)) {
+              throw new Error('This statement is no longer available.');
+            }
             const { downloadRoommateReport } = await import('./lib/roommateReport');
             downloadRoommateReport(rooms.find(room => room.id === roomId), latest);
           })}>Download monthly PDF</button></div>
         </>}
       </section>
 
-      {!archived && <section className="dash-panel finance-panel">
-        <h2>Record an expense</h2>
-        {activeMembers.length < 2 ? <p>At least one other roommate must join before you can record shared expenses.</p> :
+      {!closed && <section className="dash-panel finance-panel">
+        <div className="finance-actions finance-heading">
+          <h2>Record an expense</h2>
+          {!showExpenseForm && activeMembers.length >= 2 && <button type="button" disabled={busy}
+            aria-expanded={false} onClick={() => setShowExpenseForm(true)}>Record expense</button>}
+        </div>
+        {activeMembers.length < 2 && <p>At least one other roommate must join before you can record shared expenses.</p>}
+        {showExpenseForm && activeMembers.length >= 2 &&
           <form key={`${roomId}/${details.month}`} className="finance-form" onSubmit={saveExpense} onChange={() => { pendingExpense.current = null; }}>
             <fieldset disabled={busy}>
-              <label>Amount (₹)<input name="amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required/></label>
+              <label>Amount (₹)<input name="amount" autoFocus type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required/></label>
               <label>Expense date<input name="date" type="date" min={details.current_month} max={details.today} defaultValue={details.today} required/></label>
               <label>Remark<input name="remark" placeholder="e.g. Groceries for the flat" maxLength={240} required/></label>
               <label>Receipt (optional, up to 10 MB)<input name="receipt" type="file" accept={receiptTypes.join(',')}/></label>
-              <button>Submit for approval</button>
+              <div className="finance-actions">
+                <button>Submit for approval</button>
+                <button type="button" className="finance-secondary" onClick={() => {
+                  pendingExpense.current = null;
+                  setShowExpenseForm(false);
+                }}>Cancel</button>
+              </div>
             </fieldset>
           </form>}
       </section>}
@@ -319,26 +348,26 @@ export default function RoommateExpensesPanel({ user }) {
 
       <section className="dash-panel finance-panel">
         <div className="finance-actions finance-heading">
-          <h2>{archived || showHistory ? 'Expense history' : 'Pending expenses'}</h2>
+          <h2>{closed || showHistory ? 'Expense history' : 'Pending expenses'}</h2>
           <button type="button" aria-expanded={showHistory} aria-controls="finance-expense-list"
             onClick={() => { setShowHistory(value => !value); setReceipt(null); }}>
             {showHistory ? 'Hide history' : 'History'}
           </button>
         </div>
         <div id="finance-expense-list" className="finance-expense-list">
-        {visibleExpenses.length === 0 && (showHistory || !archived) &&
+        {visibleExpenses.length === 0 && (showHistory || !closed) &&
           <p>{showHistory ? 'No expense history yet.' : 'No expenses awaiting approval.'}</p>}
         {visibleExpenses.map(expense => {
           const status = expenseStatus(expense);
           const vote = expense.shares.find(share => share.user_id === user.id);
-          const canReview = !archived && status === 'Pending' && vote?.approved === null;
+          const canReview = !closed && status === 'Pending' && vote?.approved === null;
           const waiting = expense.shares.filter(share => share.approved === null).map(share => names.get(share.user_id));
           return <article className="finance-expense" key={expense.id}>
             <div className="finance-actions finance-heading">
               <h3>{expense.remark}</h3><strong>{formatMoney(expense.amount_paise)}</strong>
             </div>
             <p>{dateLabel.format(new Date(expense.spent_on))} · {names.get(expense.payer_id)} · <strong>{status}</strong></p>
-            {!archived && status === 'Pending' && <p>Awaiting approval from {waiting.join(', ')}</p>}
+            {!closed && status === 'Pending' && <p>Awaiting approval from {waiting.join(', ')}</p>}
             <div className="finance-actions">
               {expense.receipt_path && <button type="button" disabled={busy} onClick={() => viewReceipt(expense.receipt_path)}>View receipt</button>}
               {canReview && [true, false].map(approve =>
