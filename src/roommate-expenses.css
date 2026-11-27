@@ -126,3 +126,20 @@
   max-width: 100%;
   max-height: 26rem;
 }
+
+.finance-members li {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+.finance-workspace .finance-danger {
+  background: #fff;
+  border-color: #a32323;
+  color: #a32323;
+}
+
+.finance-expense-list {
+  display: grid;
+  gap: .75rem;
+}
