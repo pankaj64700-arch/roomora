@@ -20,16 +20,18 @@ create table public.finance_expenses (
   payer_id uuid not null,
   amount_paise integer not null check (amount_paise between 1 and 100000000),
   spent_on date not null,
+  ledger_month date generated always as (spent_on - (extract(day from spent_on)::integer - 1)) stored,
   remark text not null check (char_length(btrim(remark)) between 1 and 240),
   receipt_path text unique,
   created_at timestamptz not null default now(),
   foreign key (room_id, payer_id) references public.finance_members(room_id, user_id)
 );
 
-create index finance_expenses_room_idx on public.finance_expenses (room_id, spent_on desc, created_at desc);
+create index finance_expenses_room_idx on public.finance_expenses (room_id, ledger_month, spent_on desc, created_at desc);
+create index finance_expenses_ledger_idx on public.finance_expenses (ledger_month);
 
 create table public.finance_shares (
-  expense_id uuid not null references public.finance_expenses(id),
+  expense_id uuid not null references public.finance_expenses(id) on delete cascade,
   user_id uuid not null references auth.users(id),
   approved boolean,
   primary key (expense_id, user_id)
@@ -80,22 +82,41 @@ language sql stable security definer set search_path = '' as $$
   where m.user_id = auth.uid() order by m.joined_at;
 $$;
 
-create function public.finance_room_details(p_room uuid) returns jsonb
+create function public.finance_room_details(p_room uuid, p_month date default null) returns jsonb
 language plpgsql stable security definer set search_path = '' as $$
+declare
+  v_today date := (statement_timestamp() at time zone 'Asia/Kolkata')::date;
+  v_current date := date_trunc('month', v_today::timestamp)::date;
+  v_previous date := (v_current - interval '1 month')::date;
+  v_next date := (v_current + interval '1 month')::date;
+  v_joined timestamptz;
+  v_month date;
 begin
-  if not exists (select 1 from public.finance_members where room_id = p_room and user_id = auth.uid()) then
-    raise exception 'You must join this room first.';
+  select joined_at into v_joined from public.finance_members where room_id = p_room and user_id = auth.uid();
+  if not found then raise exception 'You must join this room first.'; end if;
+  if v_today >= v_current + 10 or v_joined >= (v_current::timestamp at time zone 'Asia/Kolkata') then
+    v_previous := null;
   end if;
+
+  v_month := case when p_month = v_previous then v_previous else v_current end;
+
   return jsonb_build_object(
+    'month', v_month, 'current_month', v_current, 'previous_month', v_previous,
+    'today', v_today, 'server_now', statement_timestamp(),
+    'refresh_at', case when v_previous is null
+      then (v_next::timestamp at time zone 'Asia/Kolkata')
+      else ((v_current + 10)::timestamp at time zone 'Asia/Kolkata') end,
+    'archive_until', v_current + 9,
     'invite_token', (select invite_token from public.finance_rooms where id = p_room and owner_id = auth.uid()),
     'members', (select jsonb_agg(jsonb_build_object('id', m.user_id,
       'name', coalesce(nullif(btrim(p.display_name), ''), 'Roommate')) order by m.joined_at, m.user_id)
-      from public.finance_members m left join public.profiles p on p.id = m.user_id where m.room_id = p_room),
+      from public.finance_members m left join public.profiles p on p.id = m.user_id
+      where m.room_id = p_room and m.joined_at < ((v_month + interval '1 month') at time zone 'Asia/Kolkata')),
     'expenses', (select coalesce(jsonb_agg(to_jsonb(e) || jsonb_build_object('shares',
       (select jsonb_agg(to_jsonb(s) - 'expense_id' order by s.user_id)
        from public.finance_shares s where s.expense_id = e.id))
       order by e.spent_on desc, e.created_at desc, e.id), '[]'::jsonb)
-      from public.finance_expenses e where e.room_id = p_room)
+      from public.finance_expenses e where e.room_id = p_room and e.ledger_month = v_month)
   );
 end;
 $$;
@@ -104,7 +125,9 @@ create function public.finance_add_expense(
   p_id uuid, p_room uuid, p_amount_paise integer, p_spent_on date, p_remark text, p_receipt_path text
 ) returns void
 language plpgsql security definer set search_path = '' as $$
-declare v_count integer;
+declare
+  v_count integer;
+  v_today date := (statement_timestamp() at time zone 'Asia/Kolkata')::date;
 begin
   if not exists (select 1 from public.finance_members where room_id = p_room and user_id = auth.uid()) then
     raise exception 'You must join this room first.';
@@ -112,6 +135,9 @@ begin
   perform id from public.finance_rooms where id = p_room for update;
   if exists (select 1 from public.finance_expenses
     where id = p_id and room_id = p_room and payer_id = auth.uid()) then return; end if;
+  if p_spent_on is null or p_spent_on < date_trunc('month', v_today::timestamp)::date or p_spent_on > v_today then
+    raise exception 'Choose a date in the current month, up to today (India time).';
+  end if;
   select count(*) into v_count from public.finance_members where room_id = p_room;
   if v_count < 2 then raise exception 'At least two roommates must join before you can log an expense.'; end if;
   if p_receipt_path is not null and (
@@ -130,13 +156,18 @@ $$;
 
 create function public.finance_vote(p_expense uuid, p_approve boolean) returns void
 language plpgsql security definer set search_path = '' as $$
-declare v_payer uuid;
+declare
+  v_payer uuid;
+  v_month date;
 begin
-  select e.payer_id into v_payer from public.finance_expenses e
+  select e.payer_id, e.ledger_month into v_payer, v_month from public.finance_expenses e
   join public.finance_shares s on s.expense_id = e.id and s.user_id = auth.uid()
   where e.id = p_expense for update of e;
   if v_payer is null or v_payer = auth.uid() or p_approve is null then
     raise exception 'Only the other roommates on this expense can review it.';
+  end if;
+  if v_month <> date_trunc('month', statement_timestamp() at time zone 'Asia/Kolkata')::date then
+    raise exception 'Approvals closed at the end of this expense month.';
   end if;
   if exists (select 1 from public.finance_shares where expense_id = p_expense and approved = false) then
     raise exception 'This expense has already been declined.';
@@ -161,6 +192,8 @@ language sql stable security definer set search_path = '' as $$
     when 'read' then exists (
       select 1 from public.finance_expenses e join public.finance_members m on m.room_id = e.room_id
       where e.receipt_path = p_path and m.user_id = auth.uid()
+        and m.joined_at < ((e.ledger_month + interval '1 month') at time zone 'Asia/Kolkata')
+        and (statement_timestamp() at time zone 'Asia/Kolkata') < e.ledger_month + interval '1 month 10 days'
     )
     else false end;
 $$;
@@ -171,10 +204,10 @@ create policy finance_receipts_read on storage.objects for select to authenticat
 using (bucket_id = 'finance-receipts' and public.finance_receipt_allowed(name, 'read'));
 
 revoke execute on function public.finance_create_room(text), public.finance_join_room(uuid),
-  public.finance_rotate_invite(uuid), public.finance_list_rooms(), public.finance_room_details(uuid),
+  public.finance_rotate_invite(uuid), public.finance_list_rooms(), public.finance_room_details(uuid, date),
   public.finance_add_expense(uuid, uuid, integer, date, text, text), public.finance_vote(uuid, boolean),
   public.finance_receipt_allowed(text, text) from public, anon;
 grant execute on function public.finance_create_room(text), public.finance_join_room(uuid),
-  public.finance_rotate_invite(uuid), public.finance_list_rooms(), public.finance_room_details(uuid),
+  public.finance_rotate_invite(uuid), public.finance_list_rooms(), public.finance_room_details(uuid, date),
   public.finance_add_expense(uuid, uuid, integer, date, text, text), public.finance_vote(uuid, boolean),
   public.finance_receipt_allowed(text, text) to authenticated;

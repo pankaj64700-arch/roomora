@@ -16,7 +16,8 @@ const receiptTypes = Object.keys(receiptExtensions);
 const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
 const dateLabel = new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeZone: 'UTC' });
 const formatMoney = paise => money.format(paise / 100);
-const today = () => new Date().toLocaleDateString('sv-SE');
+const monthLabel = new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const formatMonth = date => monthLabel.format(new Date(date));
 
 async function rpc(name, args) {
   const { data, error } = await supabase.rpc(name, args);
@@ -42,13 +43,14 @@ export default function RoommateExpensesPanel({ user }) {
     setInvite(null);
   }
 
-  async function loadRooms(preferredId) {
+  async function loadRooms(preferredId, month = null) {
     const list = await rpc('finance_list_rooms');
     const selected = list.some(room => room.id === preferredId) ? preferredId : list[0]?.id ?? '';
-    const room = selected ? await rpc('finance_room_details', { p_room: selected }) : null;
+    const room = selected ? await rpc('finance_room_details', { p_room: selected, p_month: month }) : null;
     setRooms(list);
     setRoomId(selected);
     setDetails(room);
+    return room;
   }
 
   async function run(action) {
@@ -71,12 +73,38 @@ export default function RoommateExpensesPanel({ user }) {
   useEffect(() => {
     pendingExpense.current = null;
     setReceipt(null);
-  }, [roomId]);
+  }, [roomId, details?.month]);
 
   useEffect(() => {
     if (!receipt) return undefined;
     return () => URL.revokeObjectURL(receipt.url);
   }, [receipt]);
+
+  useEffect(() => {
+    if (!details) return undefined;
+    const delay = Date.parse(details.refresh_at) - Date.parse(details.server_now);
+    const nextDay = Date.parse(`${details.today}T00:00:00+05:30`) + 86400000;
+    const dailyDelay = nextDay - Date.parse(details.server_now);
+    const expiry = Date.now() + Math.min(delay, dailyDelay);
+    const refresh = () => {
+      if (Date.now() >= expiry - 100 && delay <= dailyDelay) {
+        setDetails(null);
+        setReceipt(null);
+        run(() => loadRooms(roomId));
+      } else {
+        run(() => loadRooms(roomId, details.month));
+      }
+    };
+    const timer = window.setTimeout(refresh, Math.max(0, Math.min(delay, dailyDelay, 2147483647)));
+    const resume = () => {
+      if (!document.hidden && Date.now() >= expiry - 100) refresh();
+    };
+    document.addEventListener('visibilitychange', resume);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', resume);
+    };
+  }, [details, roomId]);
 
   function createRoom(event) {
     event.preventDefault();
@@ -140,6 +168,7 @@ export default function RoommateExpensesPanel({ user }) {
   }
 
   const names = new Map(details?.members.map(member => [member.id, member.id === user.id ? `${member.name} (you)` : member.name]));
+  const archived = details && details.month !== details.current_month;
   const summary = details && summarizeExpenses(details.members, details.expenses);
   const inviteUrl = details?.invite_token && new URL(`/?view=expenses#roommate-invite=${details.invite_token}`, window.location.origin).href;
 
@@ -182,7 +211,7 @@ export default function RoommateExpensesPanel({ user }) {
       <section className="dash-panel finance-panel">
         <div className="finance-actions finance-heading">
           <h2>{rooms.find(room => room.id === roomId)?.name}</h2>
-          <button type="button" disabled={busy} onClick={() => run(() => loadRooms(roomId))}>Refresh room</button>
+          <button type="button" disabled={busy} onClick={() => run(() => loadRooms(roomId, details.month))}>Refresh room</button>
         </div>
         <ul className="finance-members" aria-label="Roommates">
           {details.members.map(member => <li key={member.id}>{names.get(member.id)}</li>)}
@@ -205,18 +234,42 @@ export default function RoommateExpensesPanel({ user }) {
       </section>
 
       <section className="dash-panel finance-panel">
+        <h2>Monthly ledger</h2>
+        <label>Expense month
+          <select disabled={busy} value={details.month} onChange={event => {
+            const month = event.target.value;
+            run(() => loadRooms(roomId, month));
+          }}>
+            <option value={details.current_month}>{formatMonth(details.current_month)} (current)</option>
+            {details.previous_month && <option value={details.previous_month}>{formatMonth(details.previous_month)} (closed)</option>}
+          </select>
+        </label>
+        <p>A new ledger opens on the 1st of every month in India time. The closed ledger is available through the 10th of the following month.</p>
+        {archived && <>
+          <p>This ledger is closed for entries and approvals. Download its statement by {dateLabel.format(new Date(details.archive_until))}.</p>
+          <div className="finance-actions"><button type="button" disabled={busy} onClick={() => run(async () => {
+            const requested = details.month;
+            const latest = await loadRooms(roomId, requested);
+            if (latest?.month !== requested) throw new Error('This statement is no longer available.');
+            const { downloadRoommateReport } = await import('./lib/roommateReport');
+            downloadRoommateReport(rooms.find(room => room.id === roomId), latest);
+          })}>Download monthly PDF</button></div>
+        </>}
+      </section>
+
+      {!archived && <section className="dash-panel finance-panel">
         <h2>Record an expense</h2>
         {details.members.length < 2 ? <p>At least one other roommate must join before you can record shared expenses.</p> :
-          <form key={roomId} className="finance-form" onSubmit={saveExpense} onChange={() => { pendingExpense.current = null; }}>
+          <form key={`${roomId}/${details.month}`} className="finance-form" onSubmit={saveExpense} onChange={() => { pendingExpense.current = null; }}>
             <fieldset disabled={busy}>
               <label>Amount (₹)<input name="amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required/></label>
-              <label>Expense date<input name="date" type="date" defaultValue={today()} required/></label>
+              <label>Expense date<input name="date" type="date" min={details.current_month} max={details.today} defaultValue={details.today} required/></label>
               <label>Remark<input name="remark" placeholder="e.g. Groceries for the flat" maxLength={240} required/></label>
               <label>Receipt (optional, up to 10 MB)<input name="receipt" type="file" accept={receiptTypes.join(',')}/></label>
               <button>Submit for approval</button>
             </fieldset>
           </form>}
-      </section>
+      </section>}
 
       <section className="dash-panel finance-panel">
         <h2>Balances</h2>
@@ -243,14 +296,14 @@ export default function RoommateExpensesPanel({ user }) {
         {details.expenses.map(expense => {
           const status = expenseStatus(expense);
           const vote = expense.shares.find(share => share.user_id === user.id);
-          const canReview = status === 'Pending' && vote?.approved === null;
+          const canReview = !archived && status === 'Pending' && vote?.approved === null;
           const waiting = expense.shares.filter(share => share.approved === null).map(share => names.get(share.user_id));
           return <article className="finance-expense" key={expense.id}>
             <div className="finance-actions finance-heading">
               <h3>{expense.remark}</h3><strong>{formatMoney(expense.amount_paise)}</strong>
             </div>
             <p>{dateLabel.format(new Date(expense.spent_on))} · {names.get(expense.payer_id)} · <strong>{status}</strong></p>
-            {status === 'Pending' && <p>Awaiting approval from {waiting.join(', ')}</p>}
+            {!archived && status === 'Pending' && <p>Awaiting approval from {waiting.join(', ')}</p>}
             <div className="finance-actions">
               {expense.receipt_path && <button type="button" disabled={busy} onClick={() => viewReceipt(expense.receipt_path)}>View receipt</button>}
               {canReview && [true, false].map(approve =>

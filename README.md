@@ -23,9 +23,15 @@ GitHub Actions runs `npm install` and `npm run build` on pushes to `main` and pu
 
 ## Roommate expenses
 
-Apply `supabase/migrations/20261128090000_roommate_expenses.sql` to the
-Supabase project used by the frontend before deploying the feature. It creates
-the room and expense functions and the private receipt bucket.
+Apply the two `roommate_expenses` and `roommate_ledger_cleanup` migrations
+in order to the Supabase project used by the frontend. Deploy the
+`finance-ledger-cleanup` Edge Function with gateway JWT verification disabled.
+The function authenticates its scheduled calls with a dedicated Vault secret.
+Register cleanup as the database administrator after deploying the function:
+
+```sql
+select finance_internal.schedule_cleanup('https://YOUR_PROJECT_REF.supabase.co');
+```
 
 Open **Roommate expenses** after signing in. Create a room, copy the invitation
 link, and share it with your roommates. Roommates sign in and choose **Join room**.
@@ -36,3 +42,11 @@ Expenses count toward balances once every other roommate on the expense approves
 them. New roommates split expenses logged after they join. The balances and
 suggested payments use approved expenses and allocate any leftover paise so the
 full total is accounted for. Roommates can use **Refresh room** to see new activity.
+
+Each monthly ledger uses Asia/Kolkata time and opens on the 1st. Approval
+ends at the month boundary and pending expenses stay outside balances. The
+previous month is read-only through the 10th of the following month for
+roommates who were members before it closed. They can download a PDF statement
+during that window. Access ends at midnight starting the 11th. The scheduled
+cleanup deletes expired expense rows and removes associated files through the
+Storage API, while preserving rooms, members, and invite links.
