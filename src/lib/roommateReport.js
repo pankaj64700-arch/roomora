@@ -22,7 +22,7 @@ export function downloadRoommateReport(room, ledger) {
     pdf.setFontSize(size);
     ctx.font = `${bold ? 'bold ' : ''}${size}px sans-serif`;
     const lines = unicode ? wrapUnicode(text, ctx, available) : pdf.splitTextToSize(text, available);
-    return { unicode, lines, size, bold, lineHeight: Math.ceil(size * 1.45) };
+    return { unicode, lines, size, bold, lineHeight: Math.ceil(size * 1.2) };
   }
 
   function draw(text, x, top, available, align = 'left') {
@@ -58,7 +58,7 @@ export function downloadRoommateReport(room, ledger) {
   }
 
   function table(title, headers, records, footer) {
-    const pad = 6;
+    const pad = 4;
     const compact = (row, bold) => row.map(cell => ({
       ...cell, text: prepare(cell.label, cell.width - 2 * pad, 10, bold)
     }));
@@ -92,7 +92,7 @@ export function downloadRoommateReport(room, ledger) {
       }
       paint(row, footer && index === body.length - 1 ? [224, 239, 233] : index % 2 ? [246, 250, 248] : null);
     });
-    y += 19;
+    y += 13;
   }
 
   const cell = (label, width, align) => ({ label, width, align });
