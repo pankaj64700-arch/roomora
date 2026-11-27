@@ -34,6 +34,7 @@ export default function RoommateExpensesPanel({ user }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [receipt, setReceipt] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const pendingExpense = useRef(null);
 
   function clearInvite() {
@@ -73,6 +74,7 @@ export default function RoommateExpensesPanel({ user }) {
   useEffect(() => {
     pendingExpense.current = null;
     setReceipt(null);
+    setShowHistory(false);
   }, [roomId, details?.month]);
 
   useEffect(() => {
@@ -167,13 +169,38 @@ export default function RoommateExpensesPanel({ user }) {
     });
   }
 
+  function removeRoommate(member) {
+    const leaving = member.id === user.id;
+    const action = leaving ? 'Leave this room?' : `Remove ${member.name} from this room?`;
+    if (!window.confirm(`${action} Approved expenses stay in the ledger. Pending expenses involving this roommate will be declined, and the invite link will change.`)) return;
+    run(async () => {
+      await rpc('finance_remove_member', { p_room: roomId, p_member: member.id });
+      await loadRooms(leaving ? '' : roomId);
+      setNotice(leaving ? 'You left the room.' : 'Roommate removed. The invitation link was replaced.');
+    });
+  }
+
+  function deleteRoom() {
+    const room = rooms.find(item => item.id === roomId);
+    if (!window.confirm(`Permanently delete “${room.name}” and its expense history for everyone? Download any available statement first.`)) return;
+    run(async () => {
+      await rpc('finance_delete_room', { p_room: roomId });
+      await loadRooms('');
+      setNotice('Room deleted.');
+    });
+  }
+
   const names = new Map(details?.members.map(member => [member.id, member.id === user.id ? `${member.name} (you)` : member.name]));
   const archived = details && details.month !== details.current_month;
+  const activeMembers = details?.members.filter(member => member.active !== false) ?? [];
+  const visibleExpenses = details?.expenses.filter(expense =>
+    showHistory ? (archived || expenseStatus(expense) !== 'Pending')
+      : (!archived && expenseStatus(expense) === 'Pending')
+  ) ?? [];
   const summary = details && summarizeExpenses(details.members, details.expenses);
   const inviteUrl = details?.invite_token && new URL(`/?view=expenses#roommate-invite=${details.invite_token}`, window.location.origin).href;
 
   return <div className="finance-workspace">
-    <p>Log shared expenses, review what roommates paid, and see who owes whom.</p>
     {error && <p role="alert" className="finance-error">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     {invite && <section className="dash-panel finance-panel">
@@ -214,11 +241,14 @@ export default function RoommateExpensesPanel({ user }) {
           <button type="button" disabled={busy} onClick={() => run(() => loadRooms(roomId, details.month))}>Refresh room</button>
         </div>
         <ul className="finance-members" aria-label="Roommates">
-          {details.members.map(member => <li key={member.id}>{names.get(member.id)}</li>)}
+          {activeMembers.map(member => <li key={member.id}>
+            <span>{names.get(member.id)}</span>
+            {inviteUrl && member.id !== user.id && <button type="button" className="finance-danger" disabled={busy}
+              aria-label={`Remove ${member.name}`} onClick={() => removeRoommate(member)}>Remove</button>}
+          </li>)}
         </ul>
         {inviteUrl && <>
           <label>Room invitation link<input value={inviteUrl} readOnly onFocus={event => event.target.select()}/></label>
-          <p>Share this link with your roommates. Replacing it stops the previous link from admitting new members.</p>
           <div className="finance-actions">
             <button type="button" disabled={busy} onClick={() => run(async () => {
               await navigator.clipboard.writeText(inviteUrl);
@@ -229,8 +259,12 @@ export default function RoommateExpensesPanel({ user }) {
               await loadRooms(roomId);
               setNotice('Invitation link replaced.');
             })}>Replace invite link</button>
+            <button type="button" className="finance-danger" disabled={busy} onClick={deleteRoom}>Delete room</button>
           </div>
         </>}
+        {!inviteUrl && <div className="finance-actions">
+          <button type="button" className="finance-danger" disabled={busy} onClick={() => removeRoommate({ id: user.id })}>Leave room</button>
+        </div>}
       </section>
 
       <section className="dash-panel finance-panel">
@@ -244,9 +278,7 @@ export default function RoommateExpensesPanel({ user }) {
             {details.previous_month && <option value={details.previous_month}>{formatMonth(details.previous_month)} (closed)</option>}
           </select>
         </label>
-        <p>A new ledger opens on the 1st of every month in India time. The closed ledger is available through the 10th of the following month.</p>
         {archived && <>
-          <p>This ledger is closed for entries and approvals. Download its statement by {dateLabel.format(new Date(details.archive_until))}.</p>
           <div className="finance-actions"><button type="button" disabled={busy} onClick={() => run(async () => {
             const requested = details.month;
             const latest = await loadRooms(roomId, requested);
@@ -259,7 +291,7 @@ export default function RoommateExpensesPanel({ user }) {
 
       {!archived && <section className="dash-panel finance-panel">
         <h2>Record an expense</h2>
-        {details.members.length < 2 ? <p>At least one other roommate must join before you can record shared expenses.</p> :
+        {activeMembers.length < 2 ? <p>At least one other roommate must join before you can record shared expenses.</p> :
           <form key={`${roomId}/${details.month}`} className="finance-form" onSubmit={saveExpense} onChange={() => { pendingExpense.current = null; }}>
             <fieldset disabled={busy}>
               <label>Amount (₹)<input name="amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required/></label>
@@ -274,26 +306,29 @@ export default function RoommateExpensesPanel({ user }) {
       <section className="dash-panel finance-panel">
         <h2>Balances</h2>
         <p>Approved total <strong>{formatMoney(summary.total)}</strong></p>
-        <p>Only fully approved expenses count. Each expense is split among the roommates who were in the room when it was recorded.</p>
         <div className="finance-table">
           <table>
             <thead><tr><th scope="col">Roommate</th><th scope="col">Paid</th><th scope="col">Share</th><th scope="col">Balance</th></tr></thead>
             <tbody>{summary.rows.map(row => <tr key={row.id}>
-              <th scope="row">{names.get(row.id)}</th><td>{formatMoney(row.paid)}</td><td>{formatMoney(row.share)}</td>
+              <th scope="row">{names.get(row.id)}{row.active === false && ' (left)'}</th><td>{formatMoney(row.paid)}</td><td>{formatMoney(row.share)}</td>
               <td>{row.difference === 0 ? 'Settled' : `${row.difference > 0 ? 'Pays' : 'Receives'} ${formatMoney(Math.abs(row.difference))}`}</td>
             </tr>)}</tbody>
           </table>
         </div>
-        <h3>Suggested payments</h3>
-        {summary.payments.length ? <ul>{summary.payments.map(({ from, to, amount }) =>
-          <li key={`${from.id}/${to.id}`}>{names.get(from.id)} pays {names.get(to.id)} <strong>{formatMoney(amount)}</strong></li>
-        )}</ul> : <p>No transfers due on approved expenses.</p>}
       </section>
 
       <section className="dash-panel finance-panel">
-        <h2>Expense history</h2>
-        {details.expenses.length === 0 && <p>No expenses recorded yet.</p>}
-        {details.expenses.map(expense => {
+        <div className="finance-actions finance-heading">
+          <h2>{archived || showHistory ? 'Expense history' : 'Pending expenses'}</h2>
+          <button type="button" aria-expanded={showHistory} aria-controls="finance-expense-list"
+            onClick={() => { setShowHistory(value => !value); setReceipt(null); }}>
+            {showHistory ? 'Hide history' : 'History'}
+          </button>
+        </div>
+        <div id="finance-expense-list" className="finance-expense-list">
+        {visibleExpenses.length === 0 && (showHistory || !archived) &&
+          <p>{showHistory ? 'No expense history yet.' : 'No expenses awaiting approval.'}</p>}
+        {visibleExpenses.map(expense => {
           const status = expenseStatus(expense);
           const vote = expense.shares.find(share => share.user_id === user.id);
           const canReview = !archived && status === 'Pending' && vote?.approved === null;
@@ -321,6 +356,7 @@ export default function RoommateExpensesPanel({ user }) {
             </div>}
           </article>;
         })}
+        </div>
       </section>
     </>}
   </div>;
