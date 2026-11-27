@@ -148,3 +148,10 @@
   background: #fff;
   color: #1e4840;
 }
+
+.finance-balance-month {
+  display: block;
+  margin-top: .15rem;
+  font-size: .9rem;
+  font-weight: 600;
+}

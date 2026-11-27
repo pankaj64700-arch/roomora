@@ -229,84 +229,7 @@ export default function RoommateExpensesPanel({ user }) {
         <button type="button" disabled={busy} onClick={clearInvite}>Dismiss invitation</button>
       </div>
     </section>}
-    <section className="dash-panel finance-panel">
-      <h2>Your expense rooms</h2>
-      {rooms?.length > 0 && <label>Open a room
-        <select disabled={busy} value={roomId} onChange={event => {
-          const id = event.target.value;
-          run(async () => {
-            await loadRooms(id);
-          });
-        }}>
-          {rooms.map(room => <option key={room.id} value={room.id}>{room.name}</option>)}
-        </select>
-      </label>}
-      {!rooms && !error && <p role="status">Loading your rooms…</p>}
-      <form className="finance-form" onSubmit={createRoom}>
-        <label>New room name<input name="name" placeholder="e.g. Hostel Room 204" required maxLength={80}/></label>
-        <button disabled={busy}>Create room</button>
-      </form>
-    </section>
     {details && <>
-      <section className="dash-panel finance-panel">
-        <div className="finance-actions finance-heading">
-          <h2>{rooms.find(room => room.id === roomId)?.name}</h2>
-          <button type="button" disabled={busy} onClick={() => run(() => loadRooms(roomId, details.month))}>Refresh room</button>
-        </div>
-        <ul className="finance-members" aria-label="Roommates">
-          {activeMembers.map(member => <li key={member.id}>
-            <span>{names.get(member.id)}</span>
-            {inviteUrl && member.id !== user.id && <button type="button" className="finance-danger" disabled={busy}
-              aria-label={`Remove ${member.name}`} onClick={() => removeRoommate(member)}>Remove</button>}
-          </li>)}
-        </ul>
-        {inviteUrl && <>
-          <label>Room invitation link<input value={inviteUrl} readOnly onFocus={event => event.target.select()}/></label>
-          <div className="finance-actions">
-            <button type="button" disabled={busy} onClick={() => run(async () => {
-              await navigator.clipboard.writeText(inviteUrl);
-              setNotice('Invite link copied.');
-            })}>Copy invite link</button>
-            <button type="button" disabled={busy} onClick={() => run(async () => {
-              await rpc('finance_rotate_invite', { p_room: roomId });
-              await loadRooms(roomId);
-              setNotice('Invitation link replaced.');
-            })}>Replace invite link</button>
-            <button type="button" className="finance-danger" disabled={busy} onClick={deleteRoom}>Delete room</button>
-          </div>
-        </>}
-        {!inviteUrl && <div className="finance-actions">
-          <button type="button" className="finance-danger" disabled={busy} onClick={() => removeRoommate({ id: user.id })}>Leave room</button>
-        </div>}
-      </section>
-
-      <section className="dash-panel finance-panel">
-        <div className="finance-actions finance-heading">
-          <h2>Monthly ledger</h2>
-          {inviteUrl && !closed && <button type="button" className="finance-danger" disabled={busy} onClick={endMonth}>End month</button>}
-        </div>
-        <label>Expense month
-          <select disabled={busy} value={details.month} onChange={event => {
-            const month = event.target.value;
-            run(() => loadRooms(roomId, month));
-          }}>
-            <option value={details.current_month}>{formatMonth(details.current_month)} ({details.month === details.current_month && closed ? 'closed' : 'current month'})</option>
-            {details.previous_month && <option value={details.previous_month}>{formatMonth(details.previous_month)} (closed)</option>}
-          </select>
-        </label>
-        {closed && <>
-          <div className="finance-actions"><button type="button" disabled={busy} onClick={() => run(async () => {
-            const requested = details.month;
-            const latest = await loadRooms(roomId, requested);
-            if (latest?.month !== requested || (!latest.closed && latest.month === latest.current_month)) {
-              throw new Error('This statement is no longer available.');
-            }
-            const { downloadRoommateReport } = await import('./lib/roommateReport');
-            downloadRoommateReport(rooms.find(room => room.id === roomId), latest);
-          })}>Download monthly PDF</button></div>
-        </>}
-      </section>
-
       {!closed && <section className="dash-panel finance-panel">
         <div className="finance-actions finance-heading">
           <h2>Record an expense</h2>
@@ -333,7 +256,29 @@ export default function RoommateExpensesPanel({ user }) {
       </section>}
 
       <section className="dash-panel finance-panel">
-        <h2>Balances</h2>
+        <h2>Balances <span className="finance-balance-month">{formatMonth(details.month)}</span></h2>
+        <label>Expense month
+          <select disabled={busy} value={details.month} onChange={event => {
+            const month = event.target.value;
+            run(() => loadRooms(roomId, month));
+          }}>
+            <option value={details.current_month}>{formatMonth(details.current_month)} ({details.month === details.current_month && closed ? 'closed' : 'current month'})</option>
+            {details.previous_month && <option value={details.previous_month}>{formatMonth(details.previous_month)} (closed)</option>}
+          </select>
+        </label>
+        {inviteUrl && !closed && <div className="finance-actions"><button type="button" className="finance-danger"
+          disabled={busy} onClick={endMonth}>End month</button></div>}
+        {closed && <>
+          <div className="finance-actions"><button type="button" disabled={busy} onClick={() => run(async () => {
+            const requested = details.month;
+            const latest = await loadRooms(roomId, requested);
+            if (latest?.month !== requested || (!latest.closed && latest.month === latest.current_month)) {
+              throw new Error('This statement is no longer available.');
+            }
+            const { downloadRoommateReport } = await import('./lib/roommateReport');
+            downloadRoommateReport(rooms.find(room => room.id === roomId), latest);
+          })}>Download monthly PDF</button></div>
+        </>}
         <p>Approved total <strong>{formatMoney(summary.total)}</strong></p>
         <div className="finance-table">
           <table>
@@ -377,7 +322,7 @@ export default function RoommateExpensesPanel({ user }) {
                   setNotice(approve ? 'Your approval was recorded.' : 'Expense declined.');
                 })}>{approve ? 'Approve' : 'Decline'}</button>)}
             </div>
-            {receipt?.path === expense.receipt_path && <div className="finance-receipt">
+            {receipt && receipt.path === expense.receipt_path && <div className="finance-receipt">
               {receipt.type.startsWith('image/') && <img src={receipt.url} alt="Expense receipt"/>}
               {receipt.type.startsWith('video/') && <video src={receipt.url} controls aria-label="Expense receipt"/>}
               <a href={receipt.url} download={`expense-receipt.${receiptExtensions[receipt.type] || 'bin'}`}>Download receipt</a>
@@ -388,5 +333,56 @@ export default function RoommateExpensesPanel({ user }) {
         </div>
       </section>
     </>}
+    <section className="dash-panel finance-panel">
+      <h2>Your expense rooms</h2>
+      {rooms?.length > 0 && <label>Open a room
+        <select disabled={busy} value={roomId} onChange={event => {
+          const id = event.target.value;
+          run(async () => {
+            await loadRooms(id);
+          });
+        }}>
+          {rooms.map(room => <option key={room.id} value={room.id}>{room.name}</option>)}
+        </select>
+      </label>}
+      {!rooms && !error && <p role="status">Loading your rooms…</p>}
+      <form className="finance-form" onSubmit={createRoom}>
+        <label>New room name<input name="name" placeholder="e.g. Hostel Room 204" required maxLength={80}/></label>
+        <button disabled={busy}>Create room</button>
+      </form>
+    </section>
+    {details && (
+      <section className="dash-panel finance-panel">
+        <div className="finance-actions finance-heading">
+          <h2>{rooms.find(room => room.id === roomId)?.name}</h2>
+          <button type="button" disabled={busy} onClick={() => run(() => loadRooms(roomId, details.month))}>Refresh room</button>
+        </div>
+        <ul className="finance-members" aria-label="Roommates">
+          {activeMembers.map(member => <li key={member.id}>
+            <span>{names.get(member.id)}</span>
+            {inviteUrl && member.id !== user.id && <button type="button" className="finance-danger" disabled={busy}
+              aria-label={`Remove ${member.name}`} onClick={() => removeRoommate(member)}>Remove</button>}
+          </li>)}
+        </ul>
+        {inviteUrl && <>
+          <label>Room invitation link<input value={inviteUrl} readOnly onFocus={event => event.target.select()}/></label>
+          <div className="finance-actions">
+            <button type="button" disabled={busy} onClick={() => run(async () => {
+              await navigator.clipboard.writeText(inviteUrl);
+              setNotice('Invite link copied.');
+            })}>Copy invite link</button>
+            <button type="button" disabled={busy} onClick={() => run(async () => {
+              await rpc('finance_rotate_invite', { p_room: roomId });
+              await loadRooms(roomId);
+              setNotice('Invitation link replaced.');
+            })}>Replace invite link</button>
+            <button type="button" className="finance-danger" disabled={busy} onClick={deleteRoom}>Delete room</button>
+          </div>
+        </>}
+        {!inviteUrl && <div className="finance-actions">
+          <button type="button" className="finance-danger" disabled={busy} onClick={() => removeRoommate({ id: user.id })}>Leave room</button>
+        </div>}
+      </section>
+    )}
   </div>;
 }
